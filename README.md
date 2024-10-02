@@ -10,3 +10,4 @@ docker-compose up --build
 import secrets
 JWT_SECRET_KEY = secrets.token_urlsafe(32)
 print(JWT_SECRET_KEY)
+
