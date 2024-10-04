@@ -16,7 +16,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - DATABASE_URL=postgresql://postgres:postgres@db-app:5432/postgres
-      - JWT_SECRET_KEY=XGMncy8pQzhh0PQTluPhkSweCm9scGEH3nZUeqkpmi8
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       - db-app
     networks:
@@ -25,9 +25,9 @@ services:
   db-app:
     image: postgres
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
       - db-app:/var/lib/postgresql/data
     ports:
