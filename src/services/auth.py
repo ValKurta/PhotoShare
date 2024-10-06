@@ -25,25 +25,21 @@ class Auth:
     def get_password_hash(self, password: str) -> str:
         return self.password_context.hash(password)
 
-    async def create_access_token(self, data: dict, expires_delta: Optional[int] = None):
+    async def create_token(self, data: dict, expires_delta: Optional[int], scope: str, default_timedelta: timedelta) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + timedelta(seconds=expires_delta)
         else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=30)
-        to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire, "scope": "access_token"})
-        encoded_access_token = jwt.encode(to_encode, self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
-        return encoded_access_token
+            expire = datetime.now(timezone.utc) + default_timedelta
+        to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire, "scope": scope})
+        encoded_token = jwt.encode(to_encode, self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
+        return encoded_token
+
+    async def create_access_token(self, data: dict, expires_delta: Optional[int] = None) -> str:
+        return await self.create_token(data, expires_delta, "access_token", timedelta(minutes=30))
 
     async def create_refresh_token(self, data: dict, expires_delta: Optional[int] = None) -> str:
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.now(timezone.utc) + timedelta(seconds=expires_delta)
-        else:
-            expire = datetime.now(timezone.utc) + timedelta(days=7)
-        to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire, "scope": "refresh_token"})
-        encoded_refresh_token = jwt.encode(to_encode, self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
-        return encoded_refresh_token
+        return await self.create_token(data, expires_delta, "refresh_token", timedelta(days=7))
 
     async def decode_refresh_token(self, refresh_token: str) -> str:
         try:

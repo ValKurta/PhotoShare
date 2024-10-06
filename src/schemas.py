@@ -29,16 +29,16 @@ class UserDbModel(BaseModel):
     is_active: bool = True
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserResponseModel(BaseModel):
     user: UserDbModel
     role: RoleEnum
-    detail: str = "User has been successfully created"
+    detail: str = "A new %new_user.role.name% has been successfully created"
 
     class Config:
-        orm_mode = True  # Enables parsing SQLAlchemy models into Pydantic models
+        from_attributes = True
 
 
 class TokenModel(BaseModel):

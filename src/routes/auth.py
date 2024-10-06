@@ -21,7 +21,7 @@ async def signup(user: UserCreateModel):
     return UserResponseModel(
         user=new_user,
         role=new_user.role,
-        detail="User has been successfully created"
+        detail=f"A new '{new_user.role.name}' has been successfully created"
     )
 
 
