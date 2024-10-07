@@ -1,5 +1,4 @@
-version: "1.0"
-
+version: "1.1"
 
 volumes:
   db-app:
@@ -38,7 +37,7 @@ services:
     volumes:
       - db-app:/var/lib/postgresql/data
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - "5432:5432"
     restart: unless-stopped
     networks:
       - app-network
