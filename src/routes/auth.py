@@ -12,13 +12,13 @@ from src.schemas import (
 from src.services.auth import auth_service
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from src.services.auth import auth_service
 from src.repository.token_blacklist import add_token_to_blacklist
 from src.database.db import get_db
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 
 @router.post(
     "/auth/signup",

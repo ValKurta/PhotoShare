@@ -8,7 +8,9 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-from src.database.db import get_db
+# from src.database.db import get_db
+from src.repository.token_blacklist import add_token_to_blacklist
+
 # from src.repository import users as repository_users
 
 from src.conf.config import settings
@@ -117,5 +119,3 @@ class Auth:
 
 
 auth_service = Auth()
-
-
