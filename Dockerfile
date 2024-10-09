@@ -1,19 +1,27 @@
-    FROM python:3.12-slim
+# Stage 1: Build stage to extract dependencies from Poetry to requirements.txt
+FROM python:3.12-alpine as stage1
 
-    WORKDIR /app
+WORKDIR /app
+COPY pyproject.toml poetry.lock ./
 
-    RUN apt-get update && apt-get install -y curl
+RUN pip install poetry
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes 
+    
+FROM python:3.12-alpine as final
 
-    RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV APP_HOME=/app
 
-    ENV PATH="/root/.local/bin:$PATH"
+WORKDIR ${APP_HOME}
 
-    COPY pyproject.toml poetry.lock /app/
+RUN apk update \
+    && apk upgrade \
+    && apk add bash
 
-    RUN poetry install --no-root
+# Copying the requirements.txt file
+COPY --from=stage1 /app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-    COPY . /app
+COPY . .
+EXPOSE 8000
 
-    EXPOSE 8000
-
-    CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["python3", "main.py"]
