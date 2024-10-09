@@ -21,3 +21,9 @@ import secrets
 JWT_SECRET_KEY = secrets.token_urlsafe(32)
 print(JWT_SECRET_KEY)
 
+# black/flake8
+poetry run black .
+poetry add pre-commit --dev
+
+# pre-commit(every time when commit) - manual run
+poetry run pre-commit run --all-files

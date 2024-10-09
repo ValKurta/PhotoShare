@@ -22,7 +22,15 @@ pydantic-settings = "^2.5.2"
 pydantic = {extras = ["email"], version = "^2.9.2"}
 
 
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+flake8 = "^7.1.1"
+pre-commit = "^4.0.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.black]
+line-length = 88
+target-version = ['py39']

@@ -1,19 +1,19 @@
-FROM python:3.12-slim
+    FROM python:3.12-slim
 
-WORKDIR /app
+    WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl
+    RUN apt-get update && apt-get install -y curl
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+    RUN curl -sSL https://install.python-poetry.org | python3 -
 
-ENV PATH="/root/.local/bin:$PATH"
+    ENV PATH="/root/.local/bin:$PATH"
 
-COPY pyproject.toml poetry.lock /app/
+    COPY pyproject.toml poetry.lock /app/
 
-RUN poetry install --no-root
+    RUN poetry install --no-root
 
-COPY . /app
+    COPY . /app
 
-EXPOSE 8000
+    EXPOSE 8000
 
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
