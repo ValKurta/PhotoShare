@@ -44,3 +44,4 @@ poetry run pre-commit run --all-files
 
 # commit without pre-commit checks
 git commit -m "commit message" --no-verify
+
