@@ -5,10 +5,10 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-# from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session
 
-# from src.database.db import get_db
-# from src.repository import users as repository_users
+from src.database.db import get_db
+from src.repository import users as repository_users
 
 from src.conf.config import settings
 
@@ -51,7 +51,7 @@ class Auth:
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme)):
+    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -71,13 +71,13 @@ class Auth:
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token is invalid")
 
-    #     user = await repository_users.get_user_by_email(email, db)
-    #     if user is None:
-    #         raise credentials_exception
-    #     return user
+        user = await repository_users.get_user_by_email(email, db)
+        if user is None:
+            raise credentials_exception
+        return user
 
     # Return a placeholder user object, skipping DB lookup
-        return {"email": email}
+    #     return {"email": email}
 
 
 auth_service = Auth()
