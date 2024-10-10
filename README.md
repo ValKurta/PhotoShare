@@ -8,7 +8,7 @@
 
 ## To run a container
 - Build an image using `docker compose build`
-- Run using `docker compose up1
+- Run using `docker compose up`
 - !!Don't forget to do `docker compose down` after you've done with your development and want to restart
 
 
