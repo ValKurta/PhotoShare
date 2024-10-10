@@ -4,25 +4,6 @@ volumes:
   db-app:
 
 services:
-  web:
-    build:
-      context: .
-      args:
-        # Setting up a buildkit for faster builds
-        - DOCKER_BUILDKIT=1
-      dockerfile: Dockerfile
-    image: team4/photoshare-app:latest
-    container_name: photoshare_app
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env 
-    depends_on:
-      db-app:
-        condition: service_healthy
-    networks:
-      - app-network
-
   db-app:
     image: postgres:16.1
     environment:
