@@ -21,7 +21,7 @@ async def create_photo(text: str, url: str, db: Session) -> Photo:
     return photo
 
 
-async def read_photo(photo_id: int, db: Session) -> Type[Photo] | None:
+async def read_photo(photo_id: int, db: Session) -> Photo | None:
     return db.query(Photo).filter(Photo.id == photo_id).first()
 
 
@@ -38,7 +38,6 @@ async def update_photo(photo_id: int, url: UploadFile, description: str, db: Ses
 async def delete_photo(photo_id: int, db: Session) -> Photo | None:
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
-    print(photo.url)
     if photo:
         db.delete(photo)
         db.commit()
