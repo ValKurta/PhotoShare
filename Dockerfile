@@ -24,4 +24,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
 
-CMD ["python3", "main.py"]
+# Ensure the script is executable
+RUN chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]
