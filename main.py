@@ -6,7 +6,7 @@ from src.middleware.security_middleware import TokenBlacklistMiddleware
 
 app = FastAPI()
 
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/api")
 app.add_middleware(TokenBlacklistMiddleware)
 
 

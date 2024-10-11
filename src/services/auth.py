@@ -8,10 +8,10 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-# from src.database.db import get_db
+from src.database.db import get_db
 from src.repository.token_blacklist import add_token_to_blacklist
 
-# from src.repository import users as repository_users
+from src.repository import users as repository_users
 
 from src.conf.config import settings
 
@@ -78,9 +78,6 @@ class Auth:
         if user is None:
             raise credentials_exception
         return user
-
-    # Return a placeholder user object, skipping DB lookup
-    #     return {"email": email}
 
     async def logout(self, token: str, db: Session) -> None:
         await add_token_to_blacklist(token, db)
