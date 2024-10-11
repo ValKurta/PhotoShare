@@ -12,12 +12,13 @@ class RoleEnum(str, Enum):
 class UserCreateModel(BaseModel):
     username: str = Field(min_length=5, max_length=50)
     email: EmailStr
-    password: str = Field(min_length=6, max_length=255)
+    hashed_password: str = Field(min_length=6, max_length=255)
+    role: RoleEnum = RoleEnum.user
 
 
 class UserLoginModel(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=6, max_length=255)
+    hashed_password: str = Field(min_length=6, max_length=255)
 
 
 class UserDbModel(BaseModel):
@@ -35,7 +36,7 @@ class UserDbModel(BaseModel):
 class UserResponseModel(BaseModel):
     user: UserDbModel
     role: RoleEnum
-    detail: str = "A new %new_user.role.name% has been successfully created"
+    detail: str
 
     class Config:
         from_attributes = True
