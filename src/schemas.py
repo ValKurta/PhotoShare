@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from enum import Enum
 
 
@@ -64,7 +64,10 @@ class TagsPhoto(BaseModel):
 
 
 class PhotoModel(BaseModel):
-    description: str
+    description: Optional[str] = Field(max_length=25)
+
+    class Config:
+        from_attributes = True
 
 
 class PhotoResponse(PhotoModel):
