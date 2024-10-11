@@ -40,6 +40,5 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
                     )
-
         response = await call_next(request)
         return response
