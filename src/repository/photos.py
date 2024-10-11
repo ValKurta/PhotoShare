@@ -55,12 +55,26 @@ async def change_description(photo_id: int, description: str, db: Session) -> Ph
 
 
 async def add_tags(photo_id: int, body: TagsPhoto, db: Session) -> Photo | None:
+    photo = db.query(Photo).filter(Photo.id == photo_id).first()
+    photo_tags = photo.tags
+
+    for tag in body.tags:
+        if len(photo_tags) < 5:
+            photo.add_tag(photo_id, tag, db)
+        else:
+
+            break
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
+
     if photo:
         photo.tags = body.tags
         db.commit()
     return photo
+
+
+async def add_tag(photo_id: int, tag: str, db: Session) -> Photo | None:
+    pass
 
 
 async def search_photos(tag: str, db: Session) -> list[Photo]:

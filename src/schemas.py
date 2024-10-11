@@ -70,3 +70,4 @@ class PhotoModel(BaseModel):
 class PhotoResponse(PhotoModel):
     id: int
     url: str
+    tags: List[str]

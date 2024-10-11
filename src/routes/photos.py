@@ -39,7 +39,10 @@ async def create_photo(file: UploadFile = File(),
 
 @router.get('/{photo_id}', response_model=PhotoResponse)
 async def read_photo(photo_id: int, db: Session = Depends(get_db)):
-    return await repository_photos.read_photo(photo_id, db)
+    photo = await repository_photos.read_photo(photo_id, db)
+    if photo is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+    return photo
 
 
 @router.put('/{photo_id}', response_model=PhotoResponse)
@@ -63,7 +66,7 @@ async def update_photo(photo_id: int,
 
     photo = await repository_photos.update_photo(photo_id, url, description, db)
     if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Contact not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
     return photo
 
 
@@ -73,7 +76,7 @@ async def delete_photo(photo_id: int,
 
     photo = await repository_photos.delete_photo(photo_id, db)
     if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Contact not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
     return photo
 
 
@@ -84,5 +87,5 @@ async def change_description(photo_id: int,
 
     photo = await repository_photos.change_description(photo_id, description, db)
     if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Contact not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
     return photo
