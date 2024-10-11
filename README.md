@@ -45,3 +45,12 @@ poetry run pre-commit run --all-files
 # commit without pre-commit checks
 git commit -m "commit message" --no-verify
 
+## To generate key.pem (private key) and cert.pem (certificate)
+# Windows(SSL)
+openssl genrsa -out key.pem 2048
+openssl req -new -x509 -key key.pem -out cert.pem -days 365
+
+# Linux/macOS 
+openssl genrsa -out ssl_keyfile.pem 2048
+openssl req -new -x509 -key ssl_keyfile.pem -out ssl_certfile.pem -days 365
+

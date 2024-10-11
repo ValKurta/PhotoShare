@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -36,4 +37,16 @@ def read_root():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    # uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    keyfile_path = os.path.join(base_dir, "key.pem")
+    certfile_path = os.path.join(base_dir, "cert.pem")
+
+    uvicorn.run(
+        app,
+        host="127.0.0.1",
+        port=8000,
+        ssl_keyfile=keyfile_path,
+        ssl_certfile=certfile_path,
+        log_level="debug",
+    )
