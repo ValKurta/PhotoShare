@@ -2,13 +2,16 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from src.routes import auth
+from fastapi import FastAPI
+from src.routes import auth, photos
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from src.middleware.rate_limit import RateLimitMiddleware
 
 
 app = FastAPI()
 
-app.include_router(auth.router, prefix="/api")
+app.include_router(auth.router)
+app.include_router(photos.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 app.add_middleware(RateLimitMiddleware, max_requests=10, window_size=60, block_time=60)
