@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, conlist
 from datetime import datetime
 from typing import List
 from enum import Enum
@@ -51,6 +51,9 @@ class TokenModel(BaseModel):
 class TagModel(BaseModel):
     name: str = Field(max_length=25)
 
+    def __str__(self):
+        return self.name
+
 
 class TagResponse(TagModel):
     id: int
@@ -70,4 +73,4 @@ class PhotoModel(BaseModel):
 class PhotoResponse(PhotoModel):
     id: int
     url: str
-    tags: List[str]
+    tags: List[TagModel]
