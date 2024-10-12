@@ -20,7 +20,11 @@ class Auth:
     password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     JWT_SECRET_KEY = settings.jwt_secret_key
     ALGORITHM = settings.algorithm
+<<<<<<< HEAD
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+=======
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+>>>>>>> origin/develop
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.password_context.verify(plain_password, hashed_password)

@@ -1,0 +1,2 @@
+# Ensure all .sh files use LF (line feed) line endings
+*.sh text eol=lf

@@ -17,7 +17,10 @@ from src.routes.permissions import is_owner_or_admin, is_admin, is_moderator_or_
 
 
 router = APIRouter(prefix='/auth', tags=["auth"])
+<<<<<<< HEAD
 security = HTTPBearer()
+=======
+>>>>>>> origin/develop
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -69,7 +72,11 @@ async def login_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = 
     "/refresh_token",
     response_model=TokenModel
 )
+<<<<<<< HEAD
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+=======
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme), db: Session = Depends(get_db)):
+>>>>>>> origin/develop
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)

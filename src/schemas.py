@@ -1,7 +1,13 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+<<<<<<< HEAD
 from enum import Enum
 from typing import List, Optional
+=======
+from typing import List, Optional
+from enum import Enum
+
+>>>>>>> origin/develop
 
 class RoleEnum(str, Enum):
     user = "user"
@@ -47,6 +53,7 @@ class TokenModel(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
+<<<<<<< HEAD
 class CommentBase(BaseModel):
     photo_id: int
     user_id: int
@@ -67,3 +74,38 @@ class Comment(BaseModel):
 
     class Config:
         from_attributes = True 
+=======
+
+class TagModel(BaseModel):
+    name: str = Field(max_length=25)
+
+
+class TagResponse(TagModel):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class TagsPhoto(BaseModel):
+    tags: List[str]
+
+
+class PhotoModel(BaseModel):
+    description: Optional[str] = Field(max_length=25)
+
+    class Config:
+        from_attributes = True
+
+
+class PhotoResponse(PhotoModel):
+    id: int
+    url: str
+
+
+class UserStatistics(BaseModel):
+    user_id: int
+    username: str
+    num_images: int
+    num_comments: int
+>>>>>>> origin/develop
