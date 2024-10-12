@@ -1,12 +1,13 @@
 import uvicorn
 from fastapi import FastAPI
-from src.routes import auth, photos
+from src.routes import auth, photos, tags
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 
 app = FastAPI()
 
 app.include_router(auth.router)
 app.include_router(photos.router)
+app.include_router(tags.router)
 app.add_middleware(TokenBlacklistMiddleware)
 
 
