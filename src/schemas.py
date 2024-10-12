@@ -75,3 +75,10 @@ class PhotoResponse(PhotoModel):
     id: int
     url: str
     tags: List[TagModel]
+      
+
+class UserStatistics(BaseModel):
+    user_id: int
+    username: str
+    num_images: int
+    num_comments: int

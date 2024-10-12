@@ -21,6 +21,7 @@ cloudinary.config(
         secure=True
     )
 
+# TODO: fetch all photos
 
 @router.post('/post_photo', response_model=PhotoResponse)
 async def create_photo(file: UploadFile = File(),
