@@ -1,10 +1,11 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
 from jose import JWTError, jwt
 from src.database.models import BlacklistedToken
 from src.database.db import get_db
 from src.conf.config import settings
+from sqlalchemy.orm import Session
 
 
 class TokenBlacklistMiddleware(BaseHTTPMiddleware):
@@ -13,7 +14,7 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
         self.jwt_secret_key = settings.jwt_secret_key
         self.algorithm = settings.algorithm
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next, db: Session = Depends(get_db)):
         authorization: str = request.headers.get("Authorization")
 
         if authorization:
@@ -26,7 +27,7 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
                     )
                     token_id = payload.get("jti")
                     print(token_id)
-                    db = next(get_db())
+
                     blacklisted_token = (
                         db.query(BlacklistedToken).filter_by(jwt=token).first()
                     )
@@ -38,7 +39,7 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
                         )
                 except JWTError:
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Oops!You are using an invalid token!"
                     )
         response = await call_next(request)
         return response

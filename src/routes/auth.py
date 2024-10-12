@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Security
+from jose import JWTError
+
 from src.schemas import (
     UserCreateModel,
     UserResponseModel,
@@ -82,13 +84,17 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oau
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.post("/auth/logout", status_code=status.HTTP_200_OK)
+@router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """
-    User logout and the addition to the black list of tokens
+    User logout and the addition into the black list of tokens
     """
-    await add_token_to_blacklist(token, db)
-    return {"detail": "Logged out successfully"}
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
+        await add_token_to_blacklist(token, db)
+        return {"detail": "Logged out successfully"}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
 # Use RoleEnum for role validation
