@@ -1,10 +1,10 @@
 import os
 import redis
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
 from src.routes import auth
-from fastapi import FastAPI, Depends
+from src.routes import admin_moderation
 from src.routes import auth, photos
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,7 @@ app = FastAPI()
 
 app.include_router(auth.router)
 app.include_router(photos.router)
+app.include_router(admin_moderation.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 
@@ -68,6 +69,7 @@ if __name__ == "__main__":
             port=8000,
             ssl_keyfile=keyfile_path,
             ssl_certfile=certfile_path,
+            reload=True,
         )
     else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000)
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

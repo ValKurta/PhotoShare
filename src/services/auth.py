@@ -29,7 +29,7 @@ class Auth:
 
     JWT_SECRET_KEY = settings.jwt_secret_key
     ALGORITHM = settings.algorithm
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.password_context.verify(plain_password, hashed_password)

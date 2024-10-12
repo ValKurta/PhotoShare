@@ -74,3 +74,10 @@ class PhotoModel(BaseModel):
 class PhotoResponse(PhotoModel):
     id: int
     url: str
+
+
+class UserStatistics(BaseModel):
+    user_id: int
+    username: str
+    num_images: int
+    num_comments: int
