@@ -3,17 +3,39 @@ import redis
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
-from src.routes import auth
-from src.routes import admin_moderation
-from src.routes import auth, photos
+from src.routes import auth, admin_moderation, photos
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from src.conf.config import settings
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
+from contextlib import asynccontextmanager
+import redis.asyncio as aioredis
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis = await aioredis.from_url(
+        f"redis://{settings.redis_host}:{settings.redis_port}",
+        encoding="utf-8",
+        decode_responses=True
+    )
+
+    try:
+        await redis.ping()
+        print("Connected to Redis successfully!")
+        await FastAPILimiter.init(redis)
+        print("FastAPILimiter initialized successfully!")
+    except Exception as e:
+        print(f"Failed to connect to Redis: {e}")
+
+    yield
+
+    await redis.close()
+    print("Application is shutting down")
+
+
+app = FastAPI(lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 
 app.include_router(auth.router)
 app.include_router(photos.router)
@@ -34,42 +56,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup():
-    r = redis.Redis(
-        host=settings.redis_host,
-        port=settings.redis_port,
-        db=0,
-        encoding="utf-8",
-        decode_responses=True
-    )
-    try:
-        r.ping()
-        print("Connected to Redis successfully!")
-        await FastAPILimiter.init(r)
-    except redis.ConnectionError:
-        print("Failed to connect to Redis!")
 
-
-@app.get("/", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+@app.get("/")
 def read_root():
     return {"message": "PhotoShare"}
 
 
 if __name__ == "__main__":
-
+    reload_flag = True
     if settings.use_https:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         keyfile_path = os.path.join(base_dir, "key.pem")
         certfile_path = os.path.join(base_dir, "cert.pem")
 
         uvicorn.run(
-            app,
+            "main:app",
             host="0.0.0.0",
             port=8000,
             ssl_keyfile=keyfile_path,
             ssl_certfile=certfile_path,
-            reload=True,
+            reload=reload_flag
         )
     else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=reload_flag
+        )

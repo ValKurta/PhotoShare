@@ -1,5 +1,6 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from fastapi import HTTPException, status, Depends
 from jose import JWTError, jwt
 from src.database.models import BlacklistedToken
@@ -7,14 +8,13 @@ from src.database.db import get_db
 from src.conf.config import settings
 from sqlalchemy.orm import Session
 
-
 class TokenBlacklistMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
         self.jwt_secret_key = settings.jwt_secret_key
         self.algorithm = settings.algorithm
 
-    async def dispatch(self, request: Request, call_next, db: Session = Depends(get_db)):
+    async def dispatch(self, request: Request, call_next):
         authorization: str = request.headers.get("Authorization")
 
         if authorization:
@@ -28,18 +28,20 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
                     token_id = payload.get("jti")
                     print(token_id)
 
-                    blacklisted_token = (
-                        db.query(BlacklistedToken).filter_by(jwt=token).first()
-                    )
+                    db: Session = next(get_db())
+
+                    blacklisted_token = db.query(BlacklistedToken).filter_by(jwt=token).first()
 
                     if blacklisted_token:
-                        raise HTTPException(
+                        return JSONResponse(
                             status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Token is blacklisted. Please log in again.",
+                            content={"detail": "Token is blacklisted. Please log in again."},
                         )
                 except JWTError:
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Oops!You are using an invalid token!"
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={"detail": "Invalid token."},
                     )
+
         response = await call_next(request)
         return response
