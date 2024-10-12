@@ -42,7 +42,7 @@ class User(Base):
         default="user",
     )
     refresh_token = Column(String(255), nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
+    allowed = Column(Boolean, nullable=False, default=True)
     avatar = Column(String(255), nullable=True)
     phone_number = Column(String(255), nullable=True)
     confirmed = Column(Boolean, nullable=False, default=False)
