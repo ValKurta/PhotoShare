@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from typing import Type
 
 from src.database.models import User
-from src.schemas import UserCreateModel, RoleEnum
-from fastapi import HTTPException
+from src.schemas import UserCreateModel
+
 from passlib.context import CryptContext
 from libgravatar import Gravatar
 
@@ -14,14 +14,14 @@ async def get_user_by_email(email: str, db: Session) -> Type[User] | None:
     return db.query(User).filter(User.email == email).first()
 
 
-async def create_user(user: UserCreateModel, db: Session) -> User:
+async def create_user(user_data: dict, db: Session) -> User:
     avatar = None
     try:
-        g = Gravatar(user.email)
+        g = Gravatar(user_data["email"])
         avatar = g.get_image()
     except Exception as e:
         print(e)
-    new_user = User(**user.dict(exclude_unset=True), avatar=avatar)
+    new_user = User(**user_data, avatar=avatar)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
