@@ -13,12 +13,12 @@ class RoleEnum(str, Enum):
 class UserCreateModel(BaseModel):
     username: str = Field(min_length=5, max_length=50)
     email: EmailStr
-    hashed_password: str = Field(min_length=6, max_length=255)
+    password: str = Field(min_length=6, max_length=255)
 
 
 class UserLoginModel(BaseModel):
     email: EmailStr
-    hashed_password: str = Field(min_length=6, max_length=255)
+    password: str = Field(min_length=6, max_length=255)
 
 
 class UserDbModel(BaseModel):
