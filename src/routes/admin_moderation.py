@@ -1,7 +1,3 @@
-import datetime
-import os
-import pickle
-
 from typing import List
 from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException, Form
 from fastapi.responses import JSONResponse
@@ -27,10 +23,17 @@ cloudinary.config(
         secure=True
     )
 
+def create_public_id(description: str, file: UploadFile) -> tuple[str, str, str]:
+    """Create a clean file identifier and return clean description, clean filename and public id."""
+
+    clean_description = description[:7].replace(" ", "")
+    clean_filename = file.filename.replace(".", "")
+    public_id = f'PhotoShare/{clean_description}{clean_filename}'
+
+    return public_id
 
 
-# response_model=List[UserStatistics]
-@router.get('/statistics')
+@router.get('/statistics', response_model=List[UserStatistics])
 async def get_user_statistics(
                             current_user: User = Depends(auth_service.get_current_user),
                             db: Session = Depends(get_db)):
@@ -50,9 +53,7 @@ async def create_photo(file: UploadFile = File(),
     is_admin(current_user)
 
     # Create a clean file identifier
-    clean_description = description[:7].replace(" ", "")
-    clean_filename = file.filename.replace(".", "")
-    public_id = f'PhotoShare/{clean_description}{clean_filename}'
+    public_id = create_public_id(description, file)
 
     try:
         # Upload the file
@@ -93,10 +94,8 @@ async def update_photo(photo_id: int,
     # Check if the current user is an admin
     is_admin(current_user)
 
-    # Create a clean file identifier
-    clean_description = description[:7].replace(" ", "")
-    clean_filename = file.filename.replace(".", "")
-    public_id = f'PhotoShare/{clean_description}{clean_filename}'
+
+    public_id = create_public_id(description, file)
 
     try:
         # Upload the file
