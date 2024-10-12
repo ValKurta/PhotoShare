@@ -33,21 +33,16 @@ async def signup(user: UserCreateModel, db: Session = Depends(get_db)):
 
     user_count = await repository_users.get_user_count(db)
     if user_count == 0:
-        # user.role = RoleEnum.admin
         role = RoleEnum.admin
     else:
-        # user.role = RoleEnum.user
         role = RoleEnum.user
 
-    # Hash the user's password
     hashed_password = auth_service.get_password_hash(user.hashed_password)
 
-    # Create a dictionary for user data and inject the role
     user_data = user.model_dump()
     user_data["role"] = role
     user_data["hashed_password"] = hashed_password
 
-    # Save the new user to the database
     new_user = await repository_users.create_user(user_data, db)
 
     response_data = UserResponseModel(
@@ -80,7 +75,10 @@ async def login_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = 
     response_model=TokenModel
 )
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme), db: Session = Depends(get_db)):
-    token = credentials.credentials
+    if hasattr(credentials, 'credentials'):
+        token = credentials.credentials
+    else:
+        token = credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user.refresh_token != token:

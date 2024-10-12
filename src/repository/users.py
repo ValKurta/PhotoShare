@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
-from typing import Type
 
 from src.database.models import User
-from src.schemas import UserCreateModel
 
 from passlib.context import CryptContext
 from libgravatar import Gravatar
@@ -10,7 +8,7 @@ from libgravatar import Gravatar
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-async def get_user_by_email(email: str, db: Session) -> Type[User] | None:
+async def get_user_by_email(email: str, db: Session) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
 
