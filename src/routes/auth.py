@@ -96,7 +96,7 @@ async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
         await add_token_to_blacklist(token, db)
-        return {"detail": f"User with token {token} has logged out successfully."}
+        return {"detail": f"User has logged out successfully."}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 

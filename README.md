@@ -46,7 +46,12 @@ poetry run pre-commit run --all-files
 git commit -m "commit message" --no-verify
 
 ## To generate key.pem (private key) and cert.pem (certificate)
-# Windows(SSL)
+# How to install OpenSSL on Windows:
+# - download and Install OpenSSL(https://slproweb.com/products/Win32OpenSSL.html)
+# - during installation, choose to install OpenSSL binaries to a directory (e.g., C:\OpenSSL-Win64).
+# - add the bin directory (e.g., C:\OpenSSL-Win64\bin) to your system PATH during installation, or do so manually(Right-click This PC > Properties > Advanced system settings > Environment Variables->Under System variables, find the Path variable, click Edit, and add the OpenSSL bin directory)
+# - verify the installation by opening Command Prompt (CMD) or PowerShell and running `openssl version`
+# # Windows(SSL)
 openssl genrsa -out key.pem 2048
 openssl req -new -x509 -key key.pem -out cert.pem -days 365
 
