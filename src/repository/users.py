@@ -41,3 +41,18 @@ async def update_user_in_db(user: User, db: Session):
     db.add(user)
     db.commit()
     db.refresh(user)
+
+
+async def update_avatar(email, url: str, db: Session) -> User:
+    user = await get_user_by_email(email, db)
+    user.avatar = url
+    db.commit()
+    return user
+
+
+async def update_user_profile(user: User, update_data: dict, db: Session) -> User:
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    db.commit()
+    db.refresh(user)
+    return user

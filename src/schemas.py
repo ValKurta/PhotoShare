@@ -26,8 +26,12 @@ class UserDbModel(BaseModel):
     username: str = Field(min_length=5, max_length=50)
     email: EmailStr
     created_at: datetime
+    updated_at: datetime
     role: RoleEnum = RoleEnum.user
     allowed: bool = True
+    avatar: Optional[str] = None
+    phone_number: Optional[str] = None
+    confirmed: bool
 
     class Config:
         from_attributes = True
@@ -40,6 +44,21 @@ class UserResponseModel(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserProfilePublic(BaseModel):
+    username: str = Field(min_length=5, max_length=50)
+    avatar: Optional[str] = None
+    role: RoleEnum
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserProfileEdit(BaseModel):
+    username: str
+    phone_number: Optional[str] = None
 
 
 class TokenModel(BaseModel):

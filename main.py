@@ -3,7 +3,7 @@ import redis
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
-from src.routes import auth, admin_moderation, photos
+from src.routes import auth, admin_moderation, photos, users
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from src.conf.config import settings
@@ -40,6 +40,7 @@ app = FastAPI(lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seco
 app.include_router(auth.router)
 app.include_router(photos.router)
 app.include_router(admin_moderation.router)
+app.include_router(users.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 
