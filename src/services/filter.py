@@ -1,20 +1,26 @@
 from sqlalchemy.orm import Session
-from src.database.models import Photo, Rating
+from typing import List, Optional
+from src.database.models import Photo
 
-def filter_photos(db: Session, min_rating: int = None, max_rating: int = None, start_date: str = None, end_date: str = None):
+def filter_photos_by_criteria(
+    db: Session,
+    min_rating: Optional[float],
+    max_rating: Optional[float],
+    start_date: Optional[str],
+    end_date: Optional[str]
+) -> List[Photo]:
     query = db.query(Photo)
 
-# Фильтрация по рейтингу
+    # Фильтрация по рейтингу
     if min_rating is not None:
-        query = query.join(Rating).filter(Rating.rating >= min_rating)
+        query = query.filter(Photo.rating >= min_rating)
     if max_rating is not None:
-        query = query.join(Rating).filter(Rating.rating <= max_rating)
+        query = query.filter(Photo.rating <= max_rating)
 
     # Фильтрация по дате
-    if start_date is not None:
-        query = query.filter(Photo.created_at >= start_date)
-    if end_date is not None:
-        query = query.filter(Photo.created_at <= end_date)
+    if start_date:
+        query = query.filter(Photo.upload_date >= start_date)
+    if end_date:
+        query = query.filter(Photo.upload_date <= end_date)
 
-    photos = query.all()
-    return photos
+    return query.all()

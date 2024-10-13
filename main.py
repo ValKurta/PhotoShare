@@ -3,7 +3,7 @@ import redis
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
-from src.routes import auth, admin_moderation, photos
+from src.routes import auth, admin_moderation, photos, rating, search, filter, average_rating
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from src.conf.config import settings
@@ -13,33 +13,40 @@ from contextlib import asynccontextmanager
 import redis.asyncio as aioredis
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    redis = await aioredis.from_url(
-        f"redis://{settings.redis_host}:{settings.redis_port}",
-        encoding="utf-8",
-        decode_responses=True
-    )
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     redis = await aioredis.from_url(
+#         f"redis://{settings.redis_host}:{settings.redis_port}",
+#         encoding="utf-8",
+#         decode_responses=True
+#     )
 
-    try:
-        await redis.ping()
-        print("Connected to Redis successfully!")
-        await FastAPILimiter.init(redis)
-        print("FastAPILimiter initialized successfully!")
-    except Exception as e:
-        print(f"Failed to connect to Redis: {e}")
+#     try:
+#         await redis.ping()
+#         print("Connected to Redis successfully!")
+#         await FastAPILimiter.init(redis)
+#         print("FastAPILimiter initialized successfully!")
+#     except Exception as e:
+#         print(f"Failed to connect to Redis: {e}")
 
-    yield
+#     yield
 
-    await redis.close()
-    print("Application is shutting down")
+#     await redis.close()
+#     print("Application is shutting down")
 
 
-app = FastAPI(lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+# app = FastAPI(lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+app = FastAPI()
 
 app.include_router(auth.router)
 app.include_router(photos.router)
 app.include_router(admin_moderation.router)
+
+app.include_router(rating.router)
+app.include_router(filter.router)
+app.include_router(search.router)
+app.include_router(average_rating.router)
+
 
 app.add_middleware(TokenBlacklistMiddleware)
 

@@ -1,15 +1,14 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from src import schemas
-from src.database import models
+from src.database.models import Photo
 
+async def search_photos(tag: str, keyword: str, db: Session) -> list[Photo]:
+    query = db.query(Photo)
 
+    if tag:
+        query = query.filter(Photo.tags.any(name=tag))  # Предполагается, что у вас есть связь между Photo и Tag
 
+    if keyword:
+        query = query.filter(Photo.description.ilike(f"%{keyword}%"))  # Ищем по описанию
 
-# Поиск фотографий по тегам
-def search_photos_by_tags(db: Session, tags: list[str]):
-    return db.query(models.Photo).join(models.Photo.tags).filter(models.Tag.name.in_(tags)).all()
-
-# Поиск по ключевым словам в описании
-def search_photos_by_keywords(db: Session, keywords: str):
-    return db.query(models.Photo).filter(models.Photo.description.contains(keywords)).all()
+    photos = query.all()
+    return photos
