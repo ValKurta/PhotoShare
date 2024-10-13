@@ -23,12 +23,6 @@ router = APIRouter(prefix='/auth', tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-# Custom OAuth2 form to use email instead of username
-class OAuth2EmailRequestForm(OAuth2PasswordRequestForm):
-    def __init__(self, email: str = None, password: str = None):
-        super().__init__(username=email, password=password)
-
-
 @router.post(
     "/signup",
     response_model=UserResponseModel,
@@ -66,7 +60,7 @@ async def signup(user: UserCreateModel, db: Session = Depends(get_db)):
     "/login",
     response_model=TokenModel
 )
-async def login_user(user: OAuth2EmailRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user_login = await repository_users.get_user_by_email(user.username, db)
     if user_login is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email")

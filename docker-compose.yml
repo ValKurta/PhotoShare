@@ -20,10 +20,13 @@ services:
     depends_on:
       db-app:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
     # command and volumes are added to enable live reloading
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command:
+      uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - .:/app
 
@@ -39,7 +42,6 @@ services:
       - type: volume
         source: db-app
         target: /var/lib/postgresql/data
-
     ports:
       - 0.0.0.0:${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
@@ -51,6 +53,15 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
+
+  redis:
+    image: redis:alpine
+    container_name: redis_app
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
