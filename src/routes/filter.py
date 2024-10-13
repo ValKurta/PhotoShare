@@ -4,7 +4,7 @@ from typing import List, Optional
 from src.database.db import get_db
 from src.schemas import PhotoModel
 from src.services.filter import filter_photos_by_criteria 
-from src.services.auth import get_current_user 
+# from src.services.auth import get_current_user 
 from src.database.models import User
 
 
@@ -18,7 +18,7 @@ async def filter_photos(
     start_date: Optional[str] = Query(None, description="Дата начала (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="Дата конца (YYYY-MM-DD)"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)  # если авторизация
+    # current_user: User = Depends(get_current_user)  # если авторизация
 ):
     photos = filter_photos_by_criteria(db, min_rating, max_rating, start_date, end_date)
 
