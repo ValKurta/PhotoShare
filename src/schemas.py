@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, conlist
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 from enum import Enum
 
 
@@ -19,7 +19,7 @@ class UserCreateModel(BaseModel):
 
 class UserLoginModel(BaseModel):
     email: EmailStr
-    hashed_password: str = Field(min_length=6, max_length=255)
+    password: str = Field(min_length=6, max_length=255)
 
 
 class UserDbModel(BaseModel):
@@ -37,7 +37,7 @@ class UserDbModel(BaseModel):
 class UserResponseModel(BaseModel):
     user: UserDbModel
     role: RoleEnum
-    detail: str
+    detail: str = "A new %new_user.role.name% has been successfully created"
 
     class Config:
         from_attributes = True
@@ -52,6 +52,9 @@ class TokenModel(BaseModel):
 class TagModel(BaseModel):
     name: str = Field(max_length=25)
 
+    def __str__(self):
+        return self.name
+
 
 class TagResponse(TagModel):
     id: int
@@ -65,16 +68,14 @@ class TagsPhoto(BaseModel):
 
 
 class PhotoModel(BaseModel):
-    description: Optional[str] = Field(max_length=25)
-
-    class Config:
-        from_attributes = True
+    description: str
 
 
 class PhotoResponse(PhotoModel):
     id: int
     url: str
-
+    tags: List[TagModel]
+      
 
 class UserStatistics(BaseModel):
     user_id: int
