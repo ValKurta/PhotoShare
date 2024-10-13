@@ -27,7 +27,7 @@ class UserDbModel(BaseModel):
     email: EmailStr
     created_at: datetime
     role: RoleEnum = RoleEnum.user
-    is_active: bool = True
+    allowed: bool = True
 
     class Config:
         from_attributes = True
