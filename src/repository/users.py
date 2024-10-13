@@ -7,8 +7,6 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from libgravatar import Gravatar
 
-password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 async def get_user_by_email(email: str, db: Session) -> Type[User] | None:
     return db.query(User).filter(User.email == email).first()

@@ -17,7 +17,16 @@ from src.conf.config import settings
 
 
 class Auth:
-    password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    if settings.hashing_scheme == "argon2":
+        password_context = CryptContext(
+            schemes=["argon2"],
+            argon2__time_cost=4,
+            argon2__memory_cost=131072,
+            argon2__parallelism=4
+        )
+    else:
+        password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
     JWT_SECRET_KEY = settings.jwt_secret_key
     ALGORITHM = settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

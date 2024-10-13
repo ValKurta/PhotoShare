@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Security
+from jose import JWTError, jwt
+
 from src.schemas import (
     UserCreateModel,
     UserResponseModel,
@@ -14,7 +16,7 @@ from src.database.db import get_db
 from src.database.models import User
 from pydantic import BaseModel
 from src.routes.permissions import is_owner_or_admin, is_admin, is_moderator_or_admin
-
+from src.conf.config import settings
 
 router = APIRouter(prefix='/auth', tags=["auth"])
 
@@ -68,8 +70,12 @@ async def login_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = 
     "/refresh_token",
     response_model=TokenModel
 )
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme), db: Session = Depends(get_db)):
-    token = credentials.credentials
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme),
+                        db: Session = Depends(get_db)):
+    if hasattr(credentials, 'credentials'):
+        token = credentials.credentials
+    else:
+        token = credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user.refresh_token != token:
@@ -82,13 +88,17 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oau
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@router.post("/auth/logout", status_code=status.HTTP_200_OK)
+@router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """
-    User logout and the addition to the black list of tokens
+    User logout and the addition into the black list of tokens
     """
-    await add_token_to_blacklist(token, db)
-    return {"detail": "Logged out successfully"}
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
+        await add_token_to_blacklist(token, db)
+        return {"detail": f"User with token {token} has logged out successfully."}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
 # Use RoleEnum for role validation
