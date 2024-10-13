@@ -1,8 +1,8 @@
 # PhotoShare
 
 ## To run locally (for development)
-- First uncomment the `DATABASE_URL` param that is marked for uncomment in `.env` file (it changes the database host name)
-- Do `poetry install` and maybe `poetry lock` if needed
+- First uncomment the `DATABASE_URL` and `POSTGRES_HOST` params that are marked as ***TO LAUNCH LOCALLY*** in `.env` file (it changes the database host name)
+- Perform `poetry lock` and `poetry install` to get the latest packages
 - Run `docker compose -f 'docker-compose-dev.yml' up` to enable a db
 - !!Don't forget to do `docker compose -f 'docker-compose-dev.yml' down` after you're done with your development and want to restart
 
