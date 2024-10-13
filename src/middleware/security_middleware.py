@@ -1,11 +1,12 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from fastapi import HTTPException, status
+from starlette.responses import JSONResponse
+from fastapi import HTTPException, status, Depends
 from jose import JWTError, jwt
 from src.database.models import BlacklistedToken
 from src.database.db import get_db
 from src.conf.config import settings
-
+from sqlalchemy.orm import Session
 
 class TokenBlacklistMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
@@ -26,19 +27,20 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
                     )
                     token_id = payload.get("jti")
                     print(token_id)
-                    db = next(get_db())
-                    blacklisted_token = (
-                        db.query(BlacklistedToken).filter_by(jwt=token).first()
-                    )
+
+                    db: Session = next(get_db())
+
+                    blacklisted_token = db.query(BlacklistedToken).filter_by(jwt=token).first()
 
                     if blacklisted_token:
-                        raise HTTPException(
+                        return JSONResponse(
                             status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Token is blacklisted. Please log in again.",
+                            content={"detail": "Token is blacklisted. Please log in again."},
                         )
                 except JWTError:
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={"detail": "Invalid token."},
                     )
 
         response = await call_next(request)

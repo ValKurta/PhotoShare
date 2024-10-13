@@ -29,7 +29,7 @@ photo_tags = Table(
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, nullable=False, primary_key=True, index=True)
-    username = Column(String(50), nullable=False, index=True, unique=True)
+    username = Column(String(50), nullable=False, index=True, unique=False)
     email = Column(String(255), nullable=False, unique=True, index=True)
     hashed_password = Column(String(255), nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
@@ -42,7 +42,7 @@ class User(Base):
         default="user",
     )
     refresh_token = Column(String(255), nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
+    allowed = Column(Boolean, nullable=False, default=True)
     avatar = Column(String(255), nullable=True)
     phone_number = Column(String(255), nullable=True)
     confirmed = Column(Boolean, nullable=False, default=False)
@@ -57,6 +57,7 @@ class Photo(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     url = Column(String(255), nullable=False)
+    transformed_url = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False, default=func.now())
     updated_at = Column(

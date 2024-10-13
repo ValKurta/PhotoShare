@@ -7,8 +7,6 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from libgravatar import Gravatar
 
-password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 async def get_user_by_email(email: str, db: Session) -> Type[User] | None:
     return db.query(User).filter(User.email == email).first()
@@ -26,8 +24,6 @@ async def create_user(user: UserCreateModel, db: Session) -> User:
     db.commit()
     db.refresh(new_user)
     return new_user
-
-
 async def update_token(user: User, token: str | None, db: Session) -> None:
     user.refresh_token = token
     db.commit()
