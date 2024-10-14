@@ -63,7 +63,6 @@ async def delete_photo(photo_id: int, user: User, db: Session) -> Type[Photo]:
     return photo
 
 
-async def change_description(photo_id: int, description: str, user: User, db: Session) -> Photo | None:
 async def change_description(
     photo_id: int, description: str, db: Session
 ) -> Photo | None:

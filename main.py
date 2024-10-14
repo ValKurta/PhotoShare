@@ -1,39 +1,18 @@
 import os
-import redis
+import redis.asyncio as aioredis
 import uvicorn
-
-from fastapi import FastAPI, Request, Depends
-
-from src.routes import auth
-from src.middleware.security_middleware import TokenBlacklistMiddleware
-from src.routes import auth, admin_moderation, photos, tags, comments
-
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from src.routes import (
-    auth,
-    admin_moderation,
-    photos,
-    rating,
-    search,
-    filter,
-    average_rating,
-)
-from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from src.conf.config import settings
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from contextlib import asynccontextmanager
-import redis.asyncio as aioredis
-
-from src.middleware.exception_handlers import (
-    http_exception_handler,
-    exception_handling_middleware,
-)
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-app = FastAPI()
+from src.routes import auth, admin_moderation, photos, rating, search, filter, average_rating, tags, comments
+from src.middleware.security_middleware import TokenBlacklistMiddleware
+from src.middleware.exception_handlers import http_exception_handler, exception_handling_middleware
+from src.conf.config import settings
 
 
 @asynccontextmanager
@@ -41,7 +20,7 @@ async def lifespan(app: FastAPI):
     redis = await aioredis.from_url(
         f"redis://{settings.redis_host}:{settings.redis_port}",
         encoding="utf-8",
-        decode_responses=True
+        decode_responses=True,
     )
 
     try:
