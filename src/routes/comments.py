@@ -1,4 +1,3 @@
-# src/routes/comments.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database.db import get_db
@@ -34,17 +33,21 @@ def read_comments(photo_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/update_comment/{comment_id}")
-async def modify_comment(comment_id: int, comment: CommentUpdate, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+async def modify_comment(
+        comment_id: int,
+        comment: CommentUpdate,
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db)):
     existing_comment = db.query(DB_Comment).filter(DB_Comment.id == comment_id).first()
     
     if existing_comment is None:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    # Перевірка, чи користувач є автором коментаря
+    # Checking if the user is the author of the comment
     if existing_comment.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to modify this comment")
 
-    # Оновлення коментаря
+    # The comment refresh
     for key, value in comment.dict(exclude_unset=True).items():
         setattr(existing_comment, key, value)
 
@@ -52,8 +55,3 @@ async def modify_comment(comment_id: int, comment: CommentUpdate, current_user: 
     db.refresh(existing_comment)
     
     return existing_comment
-
-
-
-
-

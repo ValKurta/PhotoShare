@@ -83,8 +83,6 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oau
         token = credentials.credentials
     else:
         token = credentials
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme), db: Session = Depends(get_db)):
-    token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user.refresh_token != token:

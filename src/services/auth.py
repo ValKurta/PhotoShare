@@ -40,7 +40,12 @@ class Auth:
     def get_password_hash(self, password: str) -> str:
         return self.password_context.hash(password)
 
-    async def create_token(self, data: dict, expires_delta: Optional[int], scope: str, default_timedelta: timedelta) -> str:
+    async def create_token(
+            self,
+            data: dict,
+            expires_delta: Optional[int],
+            scope: str,
+            default_timedelta: timedelta) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + timedelta(seconds=expires_delta)

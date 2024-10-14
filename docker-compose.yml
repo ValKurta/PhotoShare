@@ -25,8 +25,7 @@ services:
     networks:
       - app-network
     # command and volumes are added to enable live reloading
-    command:
-      uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: ./entrypoint.sh
     volumes:
       - .:/app
 
@@ -66,4 +65,3 @@ services:
 networks:
   app-network:
     name: app-network
-

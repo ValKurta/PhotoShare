@@ -195,7 +195,11 @@ async def add_tags(
 
 
 @router.delete("/delete-comment/{comment_id}", response_model=Comment)
-async def remove_comment(comment_id: int, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+async def remove_comment(
+        comment_id: int,
+        current_user: User = Depends(auth_service.get_current_user),
+        db: Session = Depends(get_db)):
+
     is_admin(current_user)
 
     deleted_comment = db.query(DB_Comment).filter(DB_Comment.id == comment_id).first()

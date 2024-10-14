@@ -63,7 +63,9 @@ async def delete_photo(photo_id: int, user: User, db: Session) -> Type[Photo]:
     return photo
 
 
-async def change_description(photo_id: int, description: str, user: User, db: Session) -> Photo | None:
+async def change_description(
+    photo_id: int, description: str, db: Session
+) -> Photo | None:
 
     photo = db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user_id == user.id)).first()
     if photo:
@@ -86,3 +88,8 @@ async def destroy_cloud_url(photo_url):
     result = cloudinary.uploader.destroy(photo_public_id)
     print(f'The old photo url was destroyed: {result["result"]}')
 
+
+
+async def search_photos(tag: str, db: Session) -> list[Photo]:
+    photos = db.query(Photo).filter(tag in Photo.tags).all()
+    return list(photos)
