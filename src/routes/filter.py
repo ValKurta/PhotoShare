@@ -15,13 +15,13 @@ router = APIRouter(prefix="/photos", tags=["photos"])
 @router.get("/filter", response_model=List[PhotoWithRatingResponse])
 async def filter_photos(
     min_rating: Optional[float] = Query(
-        None, ge=0, le=5, description="Минимальный рейтинг (0-5)"
+        None, ge=0, le=5, description="Min rating (0-5)"
     ),
     max_rating: Optional[float] = Query(
-        None, ge=0, le=5, description="Максимальный рейтинг (0-5)"
+        None, ge=0, le=5, description="Max rating (0-5)"
     ),
-    start_date: Optional[str] = Query(None, description="Дата начала (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(None, description="Дата конца (YYYY-MM-DD)"),
+    start_date: Optional[str] = Query(None, description="Start Date (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="End Date (YYYY-MM-DD)"),
     db: Session = Depends(get_db),
 ):
     try:

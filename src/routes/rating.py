@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.database.db import get_db
-from src.schemas import Rating, RatingCreate  # Импортируем схемы для рейтинга
+from src.schemas import Rating, RatingCreate
 from src.database.models import User, Photo
-from src.services.rating import add_rating  # Сервис для добавления рейтинга
+from src.services.rating import add_rating
 from src.services.auth import auth_service
 
 router = APIRouter(prefix="/photos", tags=["photos"])
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/photos", tags=["photos"])
 @router.post("/{photo_id}/rate", response_model=Rating)
 async def rate_photo(
     photo_id: int,
-    rating: RatingCreate,  # Схема для ввода данных рейтинга
+    rating: RatingCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
