@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
+from src.database.models import User
 from src.repository.token_blacklist import add_token_to_blacklist
 
 from src.repository import users as repository_users
@@ -65,9 +66,8 @@ class Auth:
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
+
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-
-
         try:
             payload = jwt.decode(token, self.JWT_SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":
