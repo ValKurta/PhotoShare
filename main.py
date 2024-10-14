@@ -94,16 +94,6 @@ async def exception_handling_middleware_app(request: Request, call_next):
     return await exception_handling_middleware(request, call_next)
 
 
-@app.get("/12")
-async def index():
-    raise HTTPException(detail="Bad Request", status_code=400)
-
-
-@app.get("/result")
-async def get_result():
-    return 1 + "1"  # this should raise an error
-
-
 if __name__ == "__main__":
     reload_flag = True
     if settings.use_https:
