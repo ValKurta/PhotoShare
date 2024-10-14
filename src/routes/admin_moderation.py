@@ -17,11 +17,11 @@ from src.database.models import User, Comment as DB_Comment
 router = APIRouter(prefix="/admin", tags=["admin_moderation"])
 
 cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    cloud_name=settings.cloudinary_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
 
 
 def create_public_id(description: str, file: UploadFile) -> tuple[str, str, str]:
@@ -39,6 +39,20 @@ async def get_user_statistics(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Get statistics for all users in the system.
+
+    Args:
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the user is not an admin.
+
+    Returns:
+        List[UserStatistics]: A list of user statistics.
+    """
+
     # raise ValueError("Not implemented")
     is_admin(current_user)
 
@@ -53,6 +67,23 @@ async def create_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Upload a new photo for a specific user.
+
+    Args:
+        file (UploadFile): The photo to upload.
+        description (str): Description of the photo.
+        user_id (int): The user ID to assign the photo to.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the upload or request is invalid.
+
+    Returns:
+        PhotoResponse: The uploaded photo's details.
+    """
+
     # Check if the current user is an admin
     is_admin(current_user)
 
@@ -85,6 +116,21 @@ async def read_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieve a photo by its ID.
+
+    Args:
+        photo_id (int): The ID of the photo.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the photo is not found.
+
+    Returns:
+        PhotoResponse: The photo details.
+    """
+
     # Check if the current user is an admin
     is_admin(current_user)
 
@@ -104,6 +150,22 @@ async def update_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Update a photo's information, including file and description.
+
+    Args:
+        photo_id (int): The ID of the photo.
+        file (UploadFile): The new file to upload.
+        description (str): The updated description of the photo.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the photo is not found.
+
+    Returns:
+        PhotoResponse: The updated photo details.
+    """
     # Check if the current user is an admin
     is_admin(current_user)
 
@@ -142,6 +204,21 @@ async def delete_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Delete a photo by its ID.
+
+    Args:
+        photo_id (int): The ID of the photo to delete.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the photo is not found.
+
+    Returns:
+        PhotoResponse: The details of the deleted photo.
+    """
+
     # Check if the current user is an admin
     is_admin(current_user)
 
@@ -160,6 +237,21 @@ async def change_description(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Update a photo's description.
+
+    Args:
+        photo_id (int): The ID of the photo to update.
+        description (str): The new description.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the photo is not found.
+
+    Returns:
+        PhotoResponse: The updated photo details.
+    """
     # Check if the current user is an admin
     is_admin(current_user)
 
@@ -180,6 +272,22 @@ async def add_tags(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Add tags to a photo, with a maximum of 5 tags.
+
+    Args:
+        photo_id (int): The ID of the photo.
+        body (TagsPhoto): Tags to add to the photo.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If there are more than 5 tags, or the photo is not found.
+
+    Returns:
+        PhotoResponse: The updated photo details with added tags.
+    """
+
     if len(body.tags) > 5:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -196,9 +304,24 @@ async def add_tags(
 
 @router.delete("/delete-comment/{comment_id}", response_model=Comment)
 async def remove_comment(
-        comment_id: int,
-        current_user: User = Depends(auth_service.get_current_user),
-        db: Session = Depends(get_db)):
+    comment_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Delete a comment by its ID.
+
+    Args:
+        comment_id (int): The ID of the comment to delete.
+        current_user (User): The current authenticated user (must be an admin).
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the comment is not found.
+
+    Returns:
+        Comment: The details of the deleted comment.
+    """
 
     is_admin(current_user)
 
@@ -209,7 +332,7 @@ async def remove_comment(
 
     db.delete(deleted_comment)
     db.commit()
-    
+
     return Comment(
         id=deleted_comment.id,
         text=deleted_comment.text,
