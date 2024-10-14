@@ -1,7 +1,3 @@
-import datetime
-import os
-import pickle
-
 from typing import List
 from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException, Form
 from sqlalchemy.orm import Session
@@ -11,7 +7,7 @@ from cloudinary.exceptions import Error, AuthorizationRequired, BadRequest
 
 from src.database.db import get_db
 from src.repository import photos as repository_photos
-from src.schemas import PhotoResponse, PhotoModel, TagsPhoto
+from src.schemas import PhotoResponse, PhotoModel, TagsPhoto, TagModel
 from src.conf.config import settings
 from src.services.auth import auth_service
 from src.database.models import User
@@ -25,26 +21,30 @@ cloudinary.config(
         secure=True
     )
 
-# TODO: fetch all photos
+# TODO: fetch all photos of all users
 
-@router.post('/', response_model=PhotoResponse)
+
+@router.post('/post_photo', response_model=PhotoResponse)
 async def create_photo(file: UploadFile = File(),
                        description: str = Form(),
-                       # current_user: User = Depends(auth_service.get_current_user),
+                       current_user: User = Depends(auth_service.get_current_user),
                        db: Session = Depends(get_db)):
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
     clean_filename = file.filename.replace(".", "")
-    public_id = f'PhotoShare/{clean_description}{clean_filename}'
+    user_name = current_user.username
+    public_id = f"PhotoShare/{user_name}{clean_description}{clean_filename}"
 
     try:
         # Upload the file
         r = cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)
 
         # Generate the Cloudinary image URL
-        url = cloudinary.CloudinaryImage(public_id).build_url(crop='fill', version=r.get('version'))
+        url = cloudinary.CloudinaryImage(public_id).build_url(
+            crop="fill", version=r.get("version")
+        )
 
-        return await repository_photos.create_photo(description, url, db)
+        return await repository_photos.create_photo(description, url, current_user, db)
     except AuthorizationRequired as e:
         print(f"Required authorization: {e}.")
     except BadRequest:
@@ -53,39 +53,50 @@ async def create_photo(file: UploadFile = File(),
         print(f"Error during loading the file: {e}")
 
 
-@router.get('/{photo_id}', response_model=PhotoResponse)
-async def read_photo(photo_id: int,
-                     # current_user: User = Depends(auth_service.get_current_user),
-                     db: Session = Depends(get_db)):
-    photo = await repository_photos.read_photo(photo_id, db)
+@router.get("/get_photo/{photo_id}", response_model=PhotoResponse)
+async def read_photo(
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    photo = await repository_photos.read_photo(photo_id, current_user, db)
     if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
+        )
     return photo
 
 
-@router.put('/{photo_id}', response_model=PhotoResponse)
-async def update_photo(photo_id: int,
-                       file: UploadFile = File(),
-                       description: str = Form(),
-                       # current_user: User = Depends(auth_service.get_current_user),
-                       db: Session = Depends(get_db)):
+@router.put("/update_photo/{photo_id}", response_model=PhotoResponse)
+async def update_photo(
+    photo_id: int,
+    file: UploadFile = File(),
+    description: str = Form(),
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
 
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
     clean_filename = file.filename.replace(".", "")
-    public_id = f'PhotoShare/{clean_description}{clean_filename}'
+    user_name = current_user.username
+    public_id = f"PhotoShare/{user_name}{clean_description}{clean_filename}"
 
     try:
         # Upload the file
         r = cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)
-
         # Generate the Cloudinary image URL
-        url = cloudinary.CloudinaryImage(public_id).build_url(crop='fill', version=r.get('version'))
-
-        photo = await repository_photos.update_photo(photo_id, url, description, db)
+        url = cloudinary.CloudinaryImage(public_id).build_url(
+            crop="fill", version=r.get("version")
+        )
+        photo = await repository_photos.update_photo(
+            photo_id, url, description, current_user, db
+        )
 
         if photo is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
+            )
         return photo
 
     except AuthorizationRequired as e:
@@ -96,39 +107,56 @@ async def update_photo(photo_id: int,
         print(f"Error during loading the file: {e}")
 
 
-@router.delete('/{photo_id}', response_model=PhotoResponse)
-async def delete_photo(photo_id: int,
-                       # current_user: User = Depends(auth_service.get_current_user),
-                       db: Session = Depends(get_db)):
+@router.delete("/delete_photo/{photo_id}")
+async def delete_photo(
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    photo = await repository_photos.delete_photo(photo_id, current_user, db)
+    return {"photo": photo, "message": "was successfully deleted"}
 
-    photo = await repository_photos.delete_photo(photo_id, db)
+
+@router.patch("/add_description/{photo_id}", response_model=PhotoResponse)
+async def change_description(
+    photo_id: int,
+    description: str = Form(),
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+
+    photo = await repository_photos.change_description(
+        photo_id, description, current_user, db
+    )
     if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
+        )
     return photo
 
 
-@router.patch('/{photo_id}', response_model=PhotoResponse)
-async def change_description(photo_id: int,
-                             description: str,
-                             # current_user: User = Depends(auth_service.get_current_user),
-                             db: Session = Depends(get_db)):
+@router.get("/get_users_photos/{user_id}", response_model=List[PhotoResponse])
+async def get_users_photos(
+    user_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    photos = await repository_photos.get_users_photos(user_id, current_user, db)
+    if len(photos) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User didn't post any photos"
+        )
+    return photos
 
-    photo = await repository_photos.change_description(photo_id, description, db)
-    if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
-    return photo
 
-
-@router.patch('/add_tags/{photo_id}', response_model=PhotoResponse)
-async def add_tags(photo_id: int,
-                   body: TagsPhoto,
-                   # current_user: User = Depends(auth_service.get_current_user),
-                   db: Session = Depends(get_db)):
-    if len(body.tags) > 5:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Can assign maximum 5 tags for a photo')
-
-    photo = await repository_photos.add_tags(photo_id, body, db)
-    if photo is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not found')
-    return photo
-
+@router.get("/get_my_photos/", response_model=List[PhotoResponse])
+async def get_my_photos(
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    photos = await repository_photos.get_users_photos(current_user.id, current_user, db)
+    if len(photos) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User didn't post any photos"
+        )
+    return photos

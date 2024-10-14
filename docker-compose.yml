@@ -16,16 +16,19 @@ services:
     ports:
       - "8000:8000"
     env_file:
-<<<<<<< HEAD
-      - .env 
-=======
       - .env
->>>>>>> origin/develop
     depends_on:
       db-app:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
+    # command and volumes are added to enable live reloading
+    command: ./entrypoint.sh
+    volumes:
+      - .:/app
+
 
   db-app:
     image: postgres:16.1
@@ -38,27 +41,27 @@ services:
       - type: volume
         source: db-app
         target: /var/lib/postgresql/data
-
     ports:
       - 0.0.0.0:${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
     networks:
       - app-network
     healthcheck:
-<<<<<<< HEAD
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_PASSWORD}"]
-=======
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
->>>>>>> origin/develop
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 10s
 
+  redis:
+    image: redis:alpine
+    container_name: redis_app
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
+
 networks:
   app-network:
-<<<<<<< HEAD
     name: app-network
-=======
-    name: app-network
->>>>>>> origin/develop

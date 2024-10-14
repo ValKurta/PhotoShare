@@ -1,4 +1,3 @@
-# src/repository/admin_moderation.py
 from src.database.models import User, Photo, Comment
 from src.schemas import UserStatistics
 from sqlalchemy.orm import Session

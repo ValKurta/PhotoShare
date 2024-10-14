@@ -15,7 +15,7 @@ WORKDIR ${APP_HOME}
 
 RUN apk update \
     && apk upgrade \
-    && apk add bash
+    && apk add bash redis build-base python3-dev py3-setuptools
 
 # Copying the requirements.txt file
 COPY --from=stage1 /app/requirements.txt .

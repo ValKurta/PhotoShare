@@ -1,8 +1,8 @@
 # PhotoShare
 
 ## To run locally (for development)
-- First uncomment the `DATABASE_URL` param that is marked for uncomment in `.env` file (it changes the database host name)
-- Do `poetry install` and maybe `poetry lock` if needed
+- First uncomment the `DATABASE_URL` and `POSTGRES_HOST` params that are marked as ***TO LAUNCH LOCALLY*** in `.env` file (it changes the database host name)
+- Perform `poetry lock` and `poetry install` to get the latest packages
 - Run `docker compose -f 'docker-compose-dev.yml' up` to enable a db
 - !!Don't forget to do `docker compose -f 'docker-compose-dev.yml' down` after you're done with your development and want to restart
 
@@ -44,7 +44,17 @@ poetry run pre-commit run --all-files
 
 # commit without pre-commit checks
 git commit -m "commit message" --no-verify
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/develop
+## To generate key.pem (private key) and cert.pem (certificate)
+# How to install OpenSSL on Windows:
+# - download and Install OpenSSL(https://slproweb.com/products/Win32OpenSSL.html)
+# - during installation, choose to install OpenSSL binaries to a directory (e.g., C:\OpenSSL-Win64).
+# - add the bin directory (e.g., C:\OpenSSL-Win64\bin) to your system PATH during installation, or do so manually(Right-click This PC > Properties > Advanced system settings > Environment Variables->Under System variables, find the Path variable, click Edit, and add the OpenSSL bin directory)
+# - verify the installation by opening Command Prompt (CMD) or PowerShell and running `openssl version`
+# # Windows(SSL)
+openssl genrsa -out key.pem 2048
+openssl req -new -x509 -key key.pem -out cert.pem -days 365
+
+# Linux/macOS 
+openssl genrsa -out ssl_keyfile.pem 2048
+openssl req -new -x509 -key ssl_keyfile.pem -out ssl_certfile.pem -days 365
