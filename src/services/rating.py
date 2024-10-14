@@ -38,7 +38,7 @@ async def add_rating(db: Session, photo_id: int, rating: RatingCreate, user_id: 
     new_rating = Rating(
         photo_id=photo_id,
         user_id=user_id,
-        rating=rating.rating,  # Оценка из схемы RatingCreate
+        rating=rating.rating,
     )
 
     db.add(new_rating)
