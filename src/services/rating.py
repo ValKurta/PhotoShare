@@ -8,11 +8,19 @@ async def add_rating(db: Session, photo_id: int, rating: RatingCreate, user_id: 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
 
     if not photo:
-        return None
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
 
     if photo.user_id == user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Вы не можете оценивать свои фотографии")
-    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="You are the photo's owner! Rate a photo of other people")
+
+    if rating.rating < 1 or rating.rating > 5:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Rating can be between 1 and 5")
+
+    existing_rating = db.query(Rating).filter(Rating.photo_id == photo_id, Rating.user_id == user_id).first()
+    if existing_rating:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You have rated this photo already!")
+
     # Создаем новый рейтинг
     new_rating = Rating(
         photo_id=photo_id,

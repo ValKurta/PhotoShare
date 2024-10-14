@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
-from src.database.models import Photo
+from src.database.models import Photo, Rating
 
 def filter_photos_by_criteria(
     db: Session,
@@ -11,16 +12,17 @@ def filter_photos_by_criteria(
 ) -> List[Photo]:
     query = db.query(Photo)
 
-    # Фильтрация по рейтингу
-    if min_rating is not None:
-        query = query.filter(Photo.rating >= min_rating)
-    if max_rating is not None:
-        query = query.filter(Photo.rating <= max_rating)
-
-    # Фильтрация по дате
     if start_date:
-        query = query.filter(Photo.upload_date >= start_date)
+        query = query.filter(Photo.created_at >= start_date)
     if end_date:
-        query = query.filter(Photo.upload_date <= end_date)
+        query = query.filter(Photo.created_at <= end_date)
+
+    if min_rating is not None or max_rating is not None:
+        query = query.outerjoin(Rating).group_by(Photo.id)
+
+        if min_rating is not None:
+            query = query.having(func.avg(Rating.rating) >= min_rating)
+        if max_rating is not None:
+            query = query.having(func.avg(Rating.rating) <= max_rating)
 
     return query.all()

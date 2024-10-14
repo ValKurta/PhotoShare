@@ -39,11 +39,10 @@ import redis.asyncio as aioredis
 app = FastAPI()
 
 app.include_router(auth.router)
+app.include_router(filter.router)
 app.include_router(photos.router)
 app.include_router(admin_moderation.router)
-
 app.include_router(rating.router)
-app.include_router(filter.router)
 app.include_router(search.router)
 app.include_router(average_rating.router)
 

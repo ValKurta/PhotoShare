@@ -9,12 +9,14 @@ from fastapi import UploadFile
 
 
 async def create_photo(text: str, url: str, db: Session) -> Photo:
-
+    transformed_url = "default_transformed_url"
     photo = Photo(
         user_id=1,
         url=url,
-        description=text
+        description=text,
+        transformed_url=transformed_url
     )
+
     db.add(photo)
     db.commit()
     db.refresh(photo)
