@@ -24,6 +24,12 @@ services:
         condition: service_started
     networks:
       - app-network
+    # command and volumes are added to enable live reloading
+    command:
+      uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+
 
   db-app:
     image: postgres:16.1
@@ -60,3 +66,4 @@ services:
 networks:
   app-network:
     name: app-network
+

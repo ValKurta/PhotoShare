@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, conlist
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 from enum import Enum
-
 
 class RoleEnum(str, Enum):
     user = "user"
@@ -13,13 +12,12 @@ class RoleEnum(str, Enum):
 class UserCreateModel(BaseModel):
     username: str = Field(min_length=5, max_length=50)
     email: EmailStr
-    hashed_password: str = Field(min_length=6, max_length=255)
-    role: RoleEnum = RoleEnum.user
+    password: str = Field(min_length=6, max_length=255)
 
 
 class UserLoginModel(BaseModel):
     email: EmailStr
-    hashed_password: str = Field(min_length=6, max_length=255)
+    password: str = Field(min_length=6, max_length=255)
 
 
 class UserDbModel(BaseModel):
@@ -37,7 +35,7 @@ class UserDbModel(BaseModel):
 class UserResponseModel(BaseModel):
     user: UserDbModel
     role: RoleEnum
-    detail: str
+    detail: str = "A new %new_user.role.name% has been successfully created"
 
     class Config:
         from_attributes = True
@@ -48,9 +46,31 @@ class TokenModel(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
+class CommentBase(BaseModel):
+    photo_id: int
+    text: str
+
+class CommentCreate(CommentBase):
+    pass
+
+class CommentUpdate(BaseModel):
+    text: str
+
+class Comment(BaseModel):
+    id: int
+    text: str
+    user_id: int
+    photo_id: int
+    created_at: str
+
+    class Config:
+        from_attributes = True 
 
 class TagModel(BaseModel):
     name: str = Field(max_length=25)
+
+    def __str__(self):
+        return self.name
 
 
 class TagResponse(TagModel):
@@ -65,16 +85,14 @@ class TagsPhoto(BaseModel):
 
 
 class PhotoModel(BaseModel):
-    description: Optional[str] = Field(max_length=25)
-
-    class Config:
-        from_attributes = True
+    description: str
 
 
 class PhotoResponse(PhotoModel):
     id: int
     url: str
-
+    tags: List[TagModel]
+      
 
 class UserStatistics(BaseModel):
     user_id: int

@@ -9,11 +9,14 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
+from src.database.models import User
 from src.repository.token_blacklist import add_token_to_blacklist
 
 from src.repository import users as repository_users
 
 from src.conf.config import settings
+
+from src.exceptions import CredentialsException, UserBlockedException
 
 
 class Auth:
@@ -63,21 +66,16 @@ class Auth:
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
+    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         try:
             payload = jwt.decode(token, self.JWT_SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":
                 email = payload["sub"]
                 if email is None:
-                    raise credentials_exception
+                    raise CredentialsException
             else:
-                raise credentials_exception
+                raise CredentialsException
         except ExpiredSignatureError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
         except JWTError:
@@ -85,7 +83,9 @@ class Auth:
 
         user = await repository_users.get_user_by_email(email, db)
         if user is None:
-            raise credentials_exception
+            raise CredentialsException
+        elif user.allowed is False:
+            raise UserBlockedException
         return user
 
     async def logout(self, token: str, db: Session) -> None:
