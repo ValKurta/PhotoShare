@@ -2,18 +2,11 @@ import os
 import redis
 import uvicorn
 
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, Request, Depends
 
 from src.routes import auth
 from src.middleware.security_middleware import TokenBlacklistMiddleware
-from src.routes import comments
-
-app = FastAPI()
-
-app.include_router(comments.router)
-
-from fastapi.responses import JSONResponse
-from src.routes import auth, admin_moderation, photos, tags
+from src.routes import auth, admin_moderation, photos, tags, comments
 
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +21,8 @@ from src.middleware.exception_handlers import (
     exception_handling_middleware,
 )
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+app = FastAPI()
 
 
 @asynccontextmanager
@@ -59,9 +54,8 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(photos.router)
 app.include_router(tags.router)
-
 app.include_router(admin_moderation.router)
-
+app.include_router(comments.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 

@@ -49,7 +49,6 @@ class TokenModel(BaseModel):
 
 class CommentBase(BaseModel):
     photo_id: int
-    user_id: int
     text: str
 
 class CommentCreate(CommentBase):

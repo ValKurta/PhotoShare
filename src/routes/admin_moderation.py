@@ -9,10 +9,10 @@ from cloudinary.exceptions import Error, AuthorizationRequired, BadRequest
 from src.routes.permissions import is_admin
 from src.database.db import get_db
 from src.repository import admin_moderation as repository_admin_moderation
-from src.schemas import PhotoResponse, PhotoModel, TagsPhoto, UserStatistics
+from src.schemas import Comment, PhotoResponse, PhotoModel, TagsPhoto, UserStatistics
 from src.conf.config import settings
 from src.services.auth import auth_service
-from src.database.models import User
+from src.database.models import User, Comment as DB_Comment
 
 router = APIRouter(prefix="/admin", tags=["admin_moderation"])
 
@@ -192,3 +192,25 @@ async def add_tags(
             status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
         )
     return photo
+
+
+@router.delete("/delete-comment/{comment_id}", response_model=Comment)
+async def remove_comment(comment_id: int, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+    is_admin(current_user)
+
+    deleted_comment = db.query(DB_Comment).filter(DB_Comment.id == comment_id).first()
+
+    if not deleted_comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    db.delete(deleted_comment)
+    db.commit()
+    
+    return Comment(
+        id=deleted_comment.id,
+        text=deleted_comment.text,
+        created_at=deleted_comment.created_at.isoformat(),
+        updated_at=deleted_comment.updated_at.isoformat(),
+        user_id=deleted_comment.user_id,
+        photo_id=deleted_comment.photo_id,
+    )
