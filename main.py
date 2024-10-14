@@ -3,7 +3,15 @@ import redis
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
-from src.routes import auth, admin_moderation, photos, rating, search, filter, average_rating
+from src.routes import (
+    auth,
+    admin_moderation,
+    photos,
+    rating,
+    search,
+    filter,
+    average_rating,
+)
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from src.conf.config import settings
@@ -81,12 +89,7 @@ if __name__ == "__main__":
             port=8000,
             ssl_keyfile=keyfile_path,
             ssl_certfile=certfile_path,
-            reload=reload_flag
+            reload=reload_flag,
         )
     else:
-        uvicorn.run(
-            "main:app",
-            host="0.0.0.0",
-            port=8000,
-            reload=reload_flag
-        )
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)

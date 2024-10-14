@@ -10,12 +10,7 @@ from fastapi import UploadFile
 
 async def create_photo(text: str, url: str, db: Session) -> Photo:
     transformed_url = "default_transformed_url"
-    photo = Photo(
-        user_id=1,
-        url=url,
-        description=text,
-        transformed_url=transformed_url
-    )
+    photo = Photo(user_id=1, url=url, description=text, transformed_url=transformed_url)
 
     db.add(photo)
     db.commit()
@@ -27,7 +22,9 @@ async def read_photo(photo_id: int, db: Session) -> Type[Photo] | None:
     return db.query(Photo).filter(Photo.id == photo_id).first()
 
 
-async def update_photo(photo_id: int, url: UploadFile, description: str, db: Session) -> Photo | None:
+async def update_photo(
+    photo_id: int, url: UploadFile, description: str, db: Session
+) -> Photo | None:
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if photo:
@@ -46,7 +43,9 @@ async def delete_photo(photo_id: int, db: Session) -> Photo | None:
     return photo
 
 
-async def change_description(photo_id: int, description: str, db: Session) -> Photo | None:
+async def change_description(
+    photo_id: int, description: str, db: Session
+) -> Photo | None:
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if photo:

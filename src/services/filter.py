@@ -3,12 +3,13 @@ from sqlalchemy import func
 from typing import List, Optional
 from src.database.models import Photo, Rating
 
+
 def filter_photos_by_criteria(
     db: Session,
     min_rating: Optional[float],
     max_rating: Optional[float],
     start_date: Optional[str],
-    end_date: Optional[str]
+    end_date: Optional[str],
 ) -> List[Photo]:
     query = db.query(Photo)
 

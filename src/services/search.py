@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from src.database.models import Photo
 from sqlalchemy import select
 
+
 async def search_photos(tag: str, keyword: str, db: Session) -> list[Photo]:
     query = db.query(Photo)
 

@@ -86,6 +86,7 @@ class UserStatistics(BaseModel):
 class RatingCreate(BaseModel):
     rating: int
 
+
 class Rating(RatingCreate):
     id: int
     user_id: int
@@ -93,6 +94,7 @@ class Rating(RatingCreate):
 
     class Config:
         orm_mode = True
+
 
 class PhotoWithRatingResponse(BaseModel):
     id: int
