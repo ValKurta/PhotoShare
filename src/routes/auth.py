@@ -8,14 +8,14 @@ from src.schemas import (
     RoleEnum,
 )
 from src.services.auth import auth_service
-from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from src.repository import users as repository_users
 from src.repository.token_blacklist import add_token_to_blacklist
 from src.database.db import get_db
 from src.database.models import User
 from pydantic import BaseModel
-from src.routes.permissions import is_owner_or_admin, is_admin, is_moderator_or_admin
+from src.routes.permissions import is_admin
 from src.conf.config import settings
 
 router = APIRouter(prefix='/auth', tags=["auth"])
@@ -35,11 +35,18 @@ async def signup(user: UserCreateModel, db: Session = Depends(get_db)):
 
     user_count = await repository_users.get_user_count(db)
     if user_count == 0:
-        user.role = RoleEnum.admin
+        role = RoleEnum.admin
     else:
-        user.role = RoleEnum.user
-    user.hashed_password = auth_service.get_password_hash(user.hashed_password)
-    new_user = await repository_users.create_user(user, db)
+        role = RoleEnum.user
+
+    hashed_password = auth_service.get_password_hash(user.password)
+
+    user_data = user.model_dump()
+    user_data.pop("password")
+    user_data["hashed_password"] = hashed_password
+    user_data["role"] = role
+
+    new_user = await repository_users.create_user(user_data, db)
 
     response_data = UserResponseModel(
         user=new_user,
