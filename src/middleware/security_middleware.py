@@ -8,6 +8,7 @@ from src.database.db import get_db
 from src.conf.config import settings
 from sqlalchemy.orm import Session
 
+
 class TokenBlacklistMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
@@ -30,12 +31,16 @@ class TokenBlacklistMiddleware(BaseHTTPMiddleware):
 
                     db: Session = next(get_db())
 
-                    blacklisted_token = db.query(BlacklistedToken).filter_by(jwt=token).first()
+                    blacklisted_token = (
+                        db.query(BlacklistedToken).filter_by(jwt=token).first()
+                    )
 
                     if blacklisted_token:
                         return JSONResponse(
                             status_code=status.HTTP_401_UNAUTHORIZED,
-                            content={"detail": "Token is blacklisted. Please log in again."},
+                            content={
+                                "detail": "Token is blacklisted. Please log in again."
+                            },
                         )
                 except JWTError:
                     return JSONResponse(

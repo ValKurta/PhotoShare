@@ -13,13 +13,9 @@ from datetime import date, timedelta
 from fastapi import UploadFile
 
 
-async def create_photo(user_id:int, text: str, url: str, db: Session) -> Photo:
+async def create_photo(user_id: int, text: str, url: str, db: Session) -> Photo:
 
-    photo = Photo(
-        user_id=user_id,
-        url=url,
-        description=text
-    )
+    photo = Photo(user_id=user_id, url=url, description=text)
     db.add(photo)
     db.commit()
     db.refresh(photo)
@@ -30,7 +26,9 @@ async def read_photo(photo_id: int, db: Session) -> Type[Photo] | None:
     return db.query(Photo).filter(Photo.id == photo_id).first()
 
 
-async def update_photo(photo_id: int, url: UploadFile, description: str, db: Session) -> Photo | None:
+async def update_photo(
+    photo_id: int, url: UploadFile, description: str, db: Session
+) -> Photo | None:
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if photo:
@@ -49,7 +47,9 @@ async def delete_photo(photo_id: int, db: Session) -> Photo | None:
     return photo
 
 
-async def change_description(photo_id: int, description: str, db: Session) -> Photo | None:
+async def change_description(
+    photo_id: int, description: str, db: Session
+) -> Photo | None:
 
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if photo:
@@ -85,6 +85,7 @@ async def search_photos(tag: str, db: Session) -> list[Photo]:
     photos = db.query(Photo).filter(tag in Photo.tags).all()
     return list(photos)
 
+
 async def get_user_statistics(db: Session):
     statistics = []
     users = db.query(User).all()
@@ -94,7 +95,7 @@ async def get_user_statistics(db: Session):
             user_id=user.id,
             username=user.username,
             num_images=db.query(Photo).filter(Photo.user_id == user.id).count(),
-            num_comments=db.query(Comment).filter(Comment.user_id == user.id).count()
+            num_comments=db.query(Comment).filter(Comment.user_id == user.id).count(),
         )
         statistics.append(user_stats)
 

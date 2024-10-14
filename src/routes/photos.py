@@ -15,20 +15,22 @@ from src.database.models import User
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    cloud_name=settings.cloudinary_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
 
 # TODO: fetch all photos of all users
 
 
-@router.post('/post_photo', response_model=PhotoResponse)
-async def create_photo(file: UploadFile = File(),
-                       description: str = Form(),
-                       current_user: User = Depends(auth_service.get_current_user),
-                       db: Session = Depends(get_db)):
+@router.post("/post_photo", response_model=PhotoResponse)
+async def create_photo(
+    file: UploadFile = File(),
+    description: str = Form(),
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
     clean_filename = file.filename.replace(".", "")

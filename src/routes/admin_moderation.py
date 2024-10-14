@@ -17,11 +17,11 @@ from src.database.models import User, Comment as DB_Comment
 router = APIRouter(prefix="/admin", tags=["admin_moderation"])
 
 cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    cloud_name=settings.cloudinary_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
 
 
 def create_public_id(description: str, file: UploadFile) -> tuple[str, str, str]:
@@ -195,7 +195,11 @@ async def add_tags(
 
 
 @router.delete("/delete-comment/{comment_id}", response_model=Comment)
-async def remove_comment(comment_id: int, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
+async def remove_comment(
+    comment_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
     is_admin(current_user)
 
     deleted_comment = db.query(DB_Comment).filter(DB_Comment.id == comment_id).first()
@@ -205,7 +209,7 @@ async def remove_comment(comment_id: int, current_user: User = Depends(auth_serv
 
     db.delete(deleted_comment)
     db.commit()
-    
+
     return Comment(
         id=deleted_comment.id,
         text=deleted_comment.text,

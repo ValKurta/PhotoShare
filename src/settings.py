@@ -6,6 +6,5 @@ logging.basicConfig(
     handlers=[logging.FileHandler("errors.log"), logging.StreamHandler()],
 )
 
-logger = logging.getLogger("REST-APP")  
-logger.setLevel(logging.DEBUG)  
-
+logger = logging.getLogger("REST-APP")
+logger.setLevel(logging.DEBUG)

@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 
+
 class CredentialsException(HTTPException):
     def __init__(self):
         super().__init__(
@@ -13,5 +14,5 @@ class UserBlockedException(HTTPException):
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to access this platform"
+            detail="You are not allowed to access this platform",
         )

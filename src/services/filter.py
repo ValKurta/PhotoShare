@@ -1,10 +1,17 @@
 from sqlalchemy.orm import Session
 from src.database.models import Photo, Rating
 
-def filter_photos(db: Session, min_rating: int = None, max_rating: int = None, start_date: str = None, end_date: str = None):
+
+def filter_photos(
+    db: Session,
+    min_rating: int = None,
+    max_rating: int = None,
+    start_date: str = None,
+    end_date: str = None,
+):
     query = db.query(Photo)
 
-# Фильтрация по рейтингу
+    # Фильтрация по рейтингу
     if min_rating is not None:
         query = query.join(Rating).filter(Rating.rating >= min_rating)
     if max_rating is not None:

@@ -9,11 +9,12 @@ def add_rating(db: Session, user_id: int, photo_id: int, rating_value: int):
     photo_owner = db.query(Photo.user_id).filter(Photo.id == photo_id).first()
     if photo_owner and photo_owner.user_id == user_id:
         raise ValueError("Вы не можете оценивать собственные фотографии.")
-    
-    existing_rating = db.query(Rating).filter(
-        Rating.user_id == user_id,
-        Rating.photo_id == photo_id
-    ).first()
+
+    existing_rating = (
+        db.query(Rating)
+        .filter(Rating.user_id == user_id, Rating.photo_id == photo_id)
+        .first()
+    )
 
     if existing_rating:
         raise ValueError("Вы уже оценили эту фотографию.")
@@ -24,7 +25,10 @@ def add_rating(db: Session, user_id: int, photo_id: int, rating_value: int):
     db.refresh(new_rating)
     return new_rating
 
+
 # Получить средний рейтинг фотографии
 def get_average_rating(db: Session, photo_id: int):
-    avg_rating = db.query(func.avg(Rating.rating)).filter(Rating.photo_id == photo_id).scalar()
+    avg_rating = (
+        db.query(func.avg(Rating.rating)).filter(Rating.photo_id == photo_id).scalar()
+    )
     return avg_rating or 0
