@@ -6,7 +6,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+<<<<<<< HEAD
+DATABASE_URL = os.getenv("DATABASE_URL")
+=======
 DATABASE_URL = os.getenv('DATABASE_URL')
+>>>>>>> origin/develop
 
 engine = create_engine(DATABASE_URL)
 
@@ -20,4 +24,7 @@ def get_db():
         yield db
     finally:
         db.close()
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/develop

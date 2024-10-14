@@ -3,6 +3,15 @@ import redis
 import uvicorn
 
 from fastapi import FastAPI, HTTPException, Request, Depends
+
+from src.routes import auth
+from src.middleware.security_middleware import TokenBlacklistMiddleware
+from src.routes import comments
+
+app = FastAPI()
+
+app.include_router(comments.router)
+
 from fastapi.responses import JSONResponse
 from src.routes import auth, admin_moderation, photos, tags
 
@@ -52,6 +61,7 @@ app.include_router(photos.router)
 app.include_router(tags.router)
 
 app.include_router(admin_moderation.router)
+
 
 app.add_middleware(TokenBlacklistMiddleware)
 

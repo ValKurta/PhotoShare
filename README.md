@@ -59,3 +59,4 @@ openssl req -new -x509 -key key.pem -out cert.pem -days 365
 openssl genrsa -out ssl_keyfile.pem 2048
 openssl req -new -x509 -key ssl_keyfile.pem -out ssl_certfile.pem -days 365
 
+>>>>>>> origin/develop
