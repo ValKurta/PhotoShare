@@ -89,6 +89,7 @@ async def exception_handling_middleware_app(request: Request, call_next):
 
 
 if __name__ == "__main__":
+    print("123")
     reload_flag = True
     if settings.use_https:
         base_dir = os.path.dirname(os.path.abspath(__file__))
