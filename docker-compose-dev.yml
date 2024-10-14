@@ -4,32 +4,6 @@ volumes:
   db-app:
 
 services:
-  web:
-    build:
-      context: .
-      args:
-        # Setting up a buildkit for faster builds
-        - DOCKER_BUILDKIT=1
-      dockerfile: Dockerfile
-    image: team4/photoshare-app:latest
-    container_name: photoshare_app
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    depends_on:
-      db-app:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - app-network
-    # command and volumes are added to enable live reloading
-    command: ./entrypoint.sh
-    volumes:
-      - .:/app
-
-
   db-app:
     image: postgres:16.1
     environment:
@@ -41,6 +15,7 @@ services:
       - type: volume
         source: db-app
         target: /var/lib/postgresql/data
+
     ports:
       - 0.0.0.0:${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
