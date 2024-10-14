@@ -76,11 +76,7 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oau
         token = credentials.credentials
     else:
         token = credentials
-<<<<<<< HEAD
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
-=======
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(oauth2_scheme), db: Session = Depends(get_db)):
->>>>>>> origin/develop
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
