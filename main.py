@@ -9,7 +9,8 @@ from fastapi_limiter.depends import RateLimiter
 from contextlib import asynccontextmanager
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.routes import auth, admin_moderation, photos, rating, search, filter, average_rating, tags, comments
+from src.routes import (auth, admin_moderation, photos, rating, search, filter, average_rating, tags, comments,
+                        photo_transformation)
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from src.middleware.exception_handlers import http_exception_handler, exception_handling_middleware
 from src.conf.config import settings
@@ -44,6 +45,7 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(filter.router)
 app.include_router(photos.router)
+app.include_router(photo_transformation.router)
 app.include_router(tags.router)
 app.include_router(admin_moderation.router)
 app.include_router(rating.router)
