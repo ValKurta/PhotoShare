@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import List
 from enum import Enum
 
-
 class RoleEnum(str, Enum):
     user = "user"
     moderator = "moderator"
@@ -47,6 +46,25 @@ class TokenModel(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
+class CommentBase(BaseModel):
+    photo_id: int
+    text: str
+
+class CommentCreate(CommentBase):
+    pass
+
+class CommentUpdate(BaseModel):
+    text: str
+
+class Comment(BaseModel):
+    id: int
+    text: str
+    user_id: int
+    photo_id: int
+    created_at: str
+
+    class Config:
+        from_attributes = True 
 
 class TagModel(BaseModel):
     name: str = Field(max_length=25)
