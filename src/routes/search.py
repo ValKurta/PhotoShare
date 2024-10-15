@@ -12,6 +12,21 @@ router = APIRouter(prefix="/photos", tags=["photos"])
 async def search_photos_route(
     tag: str = None, keyword: str = None, db: Session = Depends(get_db)
 ):
+    """
+    Search for photos by tag or keyword.
+
+    Args:
+        tag (str, optional): Tag to filter photos by.
+        keyword (str, optional): Keyword to filter photos by.
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If neither 'tag' nor 'keyword' is provided.
+
+    Returns:
+        List[PhotoResponse]: List of photos matching the search criteria.
+    """
+
     if not tag and not keyword:
         raise HTTPException(
             status_code=400,
