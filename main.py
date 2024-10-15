@@ -69,8 +69,8 @@ app = FastAPI(
 
     """,
     version="1.0.0",
-    lifespan=lifespan,
-    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
+#    lifespan=lifespan,
+#    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
     docs_url="/docs",
     redoc_url=None,
 )
