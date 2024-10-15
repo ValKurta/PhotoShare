@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Security
+from fastapi import APIRouter, HTTPException, status, Depends, Security, Form
 from jose import JWTError, jwt
 
 from src.schemas import (

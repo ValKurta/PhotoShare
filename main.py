@@ -9,6 +9,7 @@ from fastapi_limiter.depends import RateLimiter
 from contextlib import asynccontextmanager
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+
 from src.routes import (
     auth,
     admin_moderation,
@@ -19,7 +20,9 @@ from src.routes import (
     average_rating,
     tags,
     comments,
+    users,
 )
+
 from src.middleware.security_middleware import TokenBlacklistMiddleware
 from src.middleware.exception_handlers import (
     http_exception_handler,
@@ -84,6 +87,7 @@ app.include_router(rating.router)
 app.include_router(search.router)
 app.include_router(average_rating.router)
 app.include_router(comments.router)
+app.include_router(users.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 
