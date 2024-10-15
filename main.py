@@ -118,20 +118,23 @@ async def exception_handling_middleware_app(request: Request, call_next):
     return await exception_handling_middleware(request, call_next)
 
 
-if __name__ == "__main__":
-    reload_flag = True
-    if settings.use_https:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        keyfile_path = os.path.join(base_dir, "key.pem")
-        certfile_path = os.path.join(base_dir, "cert.pem")
+# if __name__ == "__main__":
+#     reload_flag = True
+#     if settings.use_https:
+#         base_dir = os.path.dirname(os.path.abspath(__file__))
+#         keyfile_path = os.path.join(base_dir, "key.pem")
+#         certfile_path = os.path.join(base_dir, "cert.pem")
 
-        uvicorn.run(
-            "main:app",
-            host="0.0.0.0",
-            port=8000,
-            ssl_keyfile=keyfile_path,
-            ssl_certfile=certfile_path,
-            reload=reload_flag,
-        )
-    else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)
+#         uvicorn.run(
+#             "main:app",
+#             host="0.0.0.0",
+#             port=8000,
+#             ssl_keyfile=keyfile_path,
+#             ssl_certfile=certfile_path,
+#             reload=reload_flag,
+#         )
+#     else:
+#         uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)
