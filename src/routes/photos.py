@@ -55,7 +55,7 @@ async def create_photo(
 
         # Generate the Cloudinary image URL
         url = cloudinary.CloudinaryImage(public_id).build_url(
-            crop="fill", version=r.get("version")
+            version=r.get("version")
         )
 
         return await repository_photos.create_photo(description, url, current_user, db)
@@ -125,7 +125,7 @@ async def update_photo(
         r = cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)
         # Generate the Cloudinary image URL
         url = cloudinary.CloudinaryImage(public_id).build_url(
-            crop="fill", version=r.get("version")
+            version=r.get("version")
         )
         photo = await repository_photos.update_photo(
             photo_id, url, description, current_user, db

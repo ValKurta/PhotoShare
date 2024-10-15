@@ -1,4 +1,4 @@
-from typing import List, Any, Coroutine
+from typing import List, Any, Coroutine, Union
 from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException, Form, Query
 from fastapi.exceptions import ResponseValidationError
 from fastapi.responses import StreamingResponse
@@ -28,18 +28,14 @@ cloudinary.config(
     )
 
 
-@router.post('/photo_size/{photo_id}', response_model=PhotoEffectResponse)
+@router.post('/gravity_crop/{photo_id}', response_model=PhotoEffectResponse)
 async def change_size(photo_id: int,
-                      height: int,
+                      aspect_ratio: str,
                       width: int,
                       crop: CropEnum = Query(..., description="Choose a parameter"),
                       gravity: GravityEnum = Query(default='auto', description="Choose a parameter"),
-                      background: str = Query(default='auto', description="Choose a parameter"),
                       current_user: User = Depends(auth_service.get_current_user),
                       db: Session = Depends(get_db)):
-
-    # Check validity of dimensions
-    
     """
     Change the size of a photo.
 
@@ -58,6 +54,8 @@ async def change_size(photo_id: int,
     Returns:
     - **PhotoEffectResponse**: The updated photo details.
     """
+    
+    # Check validity of dimensions
     if width <= 0 or height <= 0:
         raise HTTPException(status_code=400, detail="Width and height must be positive numbers.")
 
@@ -65,15 +63,58 @@ async def change_size(photo_id: int,
     if gravity != 'auto' and crop not in ['fill', 'crop']:
         raise HTTPException(status_code=400, detail="Gravity can only be used with 'fill' or 'crop' options.")
 
-    if background == "auto" and crop in ["thumb", "scale", "crop"]:
-        raise HTTPException(status_code=400, detail="b_auto cannot be used with crop set to 'crop', 'thumb', 'scale'.")
-
-    resized_photo = await repository_effects.change_size(photo_id, height, width, crop, gravity, background,
+    resized_photo = await repository_effects.gravity_crop(photo_id, aspect_ratio, width, crop.value, gravity.value,
                                                          current_user, db)
     if resized_photo is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo not changed')
 
     return resized_photo
+
+
+@router.post('/coordinates_cropping/{photo_id}', response_model=PhotoEffectResponse)
+async def coordinates_crop(photo_id: int,
+                           aspect_ratio: str,
+                           width: int,
+                           x_coordinate: int,
+                           y_coordinate: int,
+                           crop: CropEnum = Query(..., description="Choose a parameter"),
+                           current_user: User = Depends(auth_service.get_current_user),
+                           db: Session = Depends(get_db)):
+
+    transformed_photo = await repository_effects.coordinates_crop(photo_id, aspect_ratio, width, x_coordinate,
+                                                                  y_coordinate, crop.value, current_user, db)
+
+    return transformed_photo
+
+
+@router.post('/reset_transformation/{photo_id}')
+async def reset_transformation(photo_id: int,
+                               current_user: User = Depends(auth_service.get_current_user),
+                               db: Session = Depends(get_db)):
+
+    transformed_photo = await repository_effects.reset_transformation(photo_id, current_user, db)
+
+    return {'photo_url': transformed_photo.url, 'transformed_photo': transformed_photo.url, 'message': 'Transformation was canceled'}
+
+
+@router.post('/save_transformation/{photo_id}')
+async def save_transformation(photo_id: int,
+                              current_user: User = Depends(auth_service.get_current_user),
+                              db: Session = Depends(get_db)):
+
+    transformed_photo = await repository_effects.save_transformation(photo_id, current_user, db)
+
+    return {'photo_url': transformed_photo.url, 'transformed_photo': transformed_photo.url, 'message': 'Transformation was saved'}
+
+
+@router.post('/roll_back_transformations/{photo_id}')
+async def roll_back_transformations(photo_id: int,
+                                    current_user: User = Depends(auth_service.get_current_user),
+                                    db: Session = Depends(get_db)):
+
+    transformed_photo = await repository_effects.roll_back_transformations(photo_id, current_user, db)
+
+    return {'photo_url': transformed_photo.url, 'transformed_photo': transformed_photo.url, 'message': 'All the transformations were canceled'}
 
 
 @router.post('/get_qr_code/{photo_id}')
