@@ -30,6 +30,7 @@ fastapi-limiter = "^0.1.6"
 redis = "^5.1.1"
 
 
+pdoc = "^15.0.0"
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
 flake8 = "^7.1.1"
@@ -42,3 +43,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 88
 target-version = ['py39']
+
+[tool.poetry.scripts]
+generate-docs = "pdoc --html --output-dir docs src"

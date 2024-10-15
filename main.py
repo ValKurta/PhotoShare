@@ -9,9 +9,25 @@ from fastapi_limiter.depends import RateLimiter
 from contextlib import asynccontextmanager
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.routes import auth, admin_moderation, photos, rating, search, filter, average_rating, tags, comments, users
+
+from src.routes import (
+    auth,
+    admin_moderation,
+    photos,
+    rating,
+    search,
+    filter,
+    average_rating,
+    tags,
+    comments,
+    users,
+)
+
 from src.middleware.security_middleware import TokenBlacklistMiddleware
-from src.middleware.exception_handlers import http_exception_handler, exception_handling_middleware
+from src.middleware.exception_handlers import (
+    http_exception_handler,
+    exception_handling_middleware,
+)
 from src.conf.config import settings
 
 
@@ -39,6 +55,27 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))]
+)
+
+app = FastAPI(
+    title="PhotoShare RestAPI",
+    description="""
+    ## Welcome to PhotoShare API!
+
+    This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
+
+    ### Features:
+    - **User accounts**: Sign up, log in, and manage user roles;
+    - **Photo management**: Upload and manage photos (Cloudinary); 
+    - **Rating system**: Rate and get average ratings of photos.
+    - **Comment system**: Create and manage comments for every photo.  
+
+    """,
+    version="1.0.0",
+    lifespan=lifespan,
+    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
+    docs_url="/docs",
+    redoc_url=None,
 )
 
 app.include_router(auth.router)
