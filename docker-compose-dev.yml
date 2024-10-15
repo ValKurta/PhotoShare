@@ -17,7 +17,7 @@ services:
         target: /var/lib/postgresql/data
 
     ports:
-      - 0.0.0.0:${POSTGRES_PORT}:5432
+      - 0.0.0.0:${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
     networks:
       - app-network
