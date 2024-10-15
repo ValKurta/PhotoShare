@@ -84,8 +84,8 @@ class Comment(BaseModel):
     id: int
     text: str
     user_id: int
-    photo_id: int
-    created_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

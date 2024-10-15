@@ -54,21 +54,6 @@ async def lifespan(app: FastAPI):
 
 
 description = """
-ChimichangApp API helps you do awesome stuff. 🚀
-
-## Items
-
-You can **read items**.
-
-## Users
-
-You will be able to:
-
-* **Create users** (_not implemented_).
-* **Read users** (_not implemented_).
-"""
-
-description = """
 ## Welcome to PhotoShare API!
 
 This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
@@ -84,8 +69,8 @@ app = FastAPI(
     title="PhotoShare RestAPI",
     description=description,
     version="1.0.0",
-    lifespan=lifespan,
-    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
+#    lifespan=lifespan,
+#    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
     docs_url="/docs",
     redoc_url=None,
 )
