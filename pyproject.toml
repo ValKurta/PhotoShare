@@ -28,6 +28,7 @@ libgravatar = "^1.0.4"
 argon2-cffi = "^23.1.0"
 fastapi-limiter = "^0.1.6"
 redis = "^5.1.1"
+fastapi-mail = "^1.4.1"
 
 
 pdoc = "^15.0.0"
