@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 from src.database.models import User
 from src.database.db import get_db
 from src.services.auth import auth_service
-from src.schemas import UserDbModel, UserProfilePublic, UserProfileEdit
+from src.schemas import UserAverageRating, UserDbModel, UserProfilePublic, UserProfileEdit
 from src.conf.config import settings
 from src.repository import users as repository_users
+from src.services.average_rating import get_user_rating
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -77,3 +78,11 @@ async def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "role": user.role,
         "created_at": user.created_at
     }
+
+
+@router.get("/{user_id}/rating", response_model=UserAverageRating)
+async def get_user_avg_rating(user_id: int, db: Session = Depends(get_db)):
+    res = await get_user_rating(db, user_id)
+    if res is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"user_id": user_id, "rating": res}

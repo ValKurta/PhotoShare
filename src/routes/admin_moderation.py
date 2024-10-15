@@ -1,6 +1,5 @@
 from typing import List
 from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException, Form
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import cloudinary
 import cloudinary.uploader
