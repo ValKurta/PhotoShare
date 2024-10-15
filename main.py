@@ -122,16 +122,6 @@ app.add_middleware(
 def read_root():
     return {"message": "PhotoShare"}
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    """
-    Retrieve an item by its ID.
-
-    - **item_id**: The ID of the item to retrieve.
-    - **q**: An optional query parameter to search for items.
-    """
-    return {"item_id": item_id, "q": q}
-
 
 # Register the exception handler
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
