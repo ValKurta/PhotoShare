@@ -124,11 +124,15 @@ class UserStatistics(BaseModel):
     username: str
     num_images: int
     num_comments: int
+    rating: float
+    average_rating_given: float
 
+class UserAverageRating(BaseModel):
+    user_id: int
+    rating: float
 
 class RatingCreate(BaseModel):
-    rating: int
-
+    rating: int = Field(ge=0, le=5)
 
 class Rating(RatingCreate):
     id: int

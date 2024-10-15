@@ -17,7 +17,6 @@ from src.routes import (
     rating,
     search,
     filter,
-    average_rating,
     tags,
     comments,
     users,
@@ -54,24 +53,36 @@ async def lifespan(app: FastAPI):
     print("Application is shutting down")
 
 
-app = FastAPI(
-    lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))]
-)
+description = """
+ChimichangApp API helps you do awesome stuff. 🚀
+
+## Items
+
+You can **read items**.
+
+## Users
+
+You will be able to:
+
+* **Create users** (_not implemented_).
+* **Read users** (_not implemented_).
+"""
+
+description = """
+## Welcome to PhotoShare API!
+
+This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
+
+### Features:
+- **User accounts**: Sign up, log in, and manage user roles;
+- **Photo management**: Upload and manage photos (Cloudinary); 
+- **Rating system**: Rate and get average ratings of photos.
+- **Comment system**: Create and manage comments for every photo.  
+    """
 
 app = FastAPI(
     title="PhotoShare RestAPI",
-    description="""
-    ## Welcome to PhotoShare API!
-
-    This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
-
-    ### Features:
-    - **User accounts**: Sign up, log in, and manage user roles;
-    - **Photo management**: Upload and manage photos (Cloudinary); 
-    - **Rating system**: Rate and get average ratings of photos.
-    - **Comment system**: Create and manage comments for every photo.  
-
-    """,
+    description=description,
     version="1.0.0",
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=2, seconds=5))],
@@ -87,7 +98,7 @@ app.include_router(tags.router)
 app.include_router(admin_moderation.router)
 app.include_router(rating.router)
 app.include_router(search.router)
-app.include_router(average_rating.router)
+# app.include_router(average_rating.router)
 app.include_router(comments.router)
 app.include_router(users.router)
 
