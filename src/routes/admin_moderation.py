@@ -39,17 +39,17 @@ async def get_user_statistics(
     db: Session = Depends(get_db),
 ):
     """
-    Get statistics for all users in the system.
+    Retrieve statistics for all users in the system.
 
     Args:
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the user is not an admin.
+    - **HTTPException**: If the user is not an admin.
 
     Returns:
-        List[UserStatistics]: A list of user statistics.
+    - **List[UserStatistics]**: A list of user statistics.
     """
 
     # raise ValueError("Not implemented")
@@ -70,18 +70,19 @@ async def create_photo(
     Upload a new photo for a specific user.
 
     Args:
-        file (UploadFile): The photo to upload.
-        description (str): Description of the photo.
-        user_id (int): The user ID to assign the photo to.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **file** (UploadFile): The photo to upload.
+    - **description** (str): Description of the photo.
+    - **user_id** (int): The user ID to assign the photo to.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the upload or request is invalid.
+    - **HTTPException**: If the upload or request is invalid.
 
     Returns:
-        PhotoResponse: The uploaded photo's details.
+    - **PhotoResponse**: The uploaded photo's details.
     """
+
 
     # Check if the current user is an admin
     is_admin(current_user)
@@ -118,16 +119,15 @@ async def read_photo(
     """
     Retrieve a photo by its ID.
 
-    Args:
-        photo_id (int): The ID of the photo.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The photo details.
+    - **PhotoResponse**: The photo details.
     """
 
     # Check if the current user is an admin
@@ -152,18 +152,17 @@ async def update_photo(
     """
     Update a photo's information, including file and description.
 
-    Args:
-        photo_id (int): The ID of the photo.
-        file (UploadFile): The new file to upload.
-        description (str): The updated description of the photo.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo.
+    - **file** (UploadFile): The new file to upload.
+    - **description** (str): The updated description of the photo.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
     # Check if the current user is an admin
     is_admin(current_user)
@@ -206,16 +205,15 @@ async def delete_photo(
     """
     Delete a photo by its ID.
 
-    Args:
-        photo_id (int): The ID of the photo to delete.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to delete.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The details of the deleted photo.
+    - **PhotoResponse**: The details of the deleted photo.
     """
 
     # Check if the current user is an admin
@@ -239,17 +237,16 @@ async def change_description(
     """
     Update a photo's description.
 
-    Args:
-        photo_id (int): The ID of the photo to update.
-        description (str): The new description.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to update.
+    - **description** (str): The new description.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
     # Check if the current user is an admin
     is_admin(current_user)
@@ -274,17 +271,16 @@ async def add_tags(
     """
     Add tags to a photo, with a maximum of 5 tags.
 
-    Args:
-        photo_id (int): The ID of the photo.
-        body (TagsPhoto): Tags to add to the photo.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo.
+    - **body** (TagsPhoto): Tags to add to the photo.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If there are more than 5 tags, or the photo is not found.
+    - **HTTPException**: If there are more than 5 tags, or the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details with added tags.
+    - **PhotoResponse**: The updated photo details with added tags.
     """
 
     if len(body.tags) > 5:
@@ -310,16 +306,15 @@ async def remove_comment(
     """
     Delete a comment by its ID.
 
-    Args:
-        comment_id (int): The ID of the comment to delete.
-        current_user (User): The current authenticated user (must be an admin).
-        db (Session): Database session dependency.
+    - **comment_id** (int): The ID of the comment to delete.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the comment is not found.
+    - **HTTPException**: If the comment is not found.
 
     Returns:
-        Comment: The details of the deleted comment.
+    - **Comment**: The details of the deleted comment.
     """
 
     is_admin(current_user)

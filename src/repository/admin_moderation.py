@@ -87,6 +87,15 @@ async def search_photos(tag: str, db: Session) -> list[Photo]:
     return list(photos)
 
 async def get_user_statistics(db: Session):
+    """
+    Retrieve statistics for all users in the system.
+
+    Args:
+    - **db** (Session): Database session dependency.
+
+    Returns:
+    - **List[UserStatistics]**: A list of user statistics.
+    """
     statistics = []
     users = db.query(User).all()
 

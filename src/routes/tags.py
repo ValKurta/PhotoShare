@@ -20,19 +20,18 @@ async def add_tags(
     db: Session = Depends(get_db),
 ):
     """
-    Add multiple tags to a photo(max 5).
+    Add multiple tags to a photo (max 5).
 
-    Args:
-        photo_id (int): The ID of the photo to update.
-        body (TagsPhoto): The tags to add.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to update.
+    - **body** (TagsPhoto): The tags to add.
+    - **db** (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     photo = await repository_tags.add_tags(photo_id, body, current_user, db)
@@ -53,16 +52,15 @@ async def remove_tags(
     """
     Remove all tags from a photo.
 
-    Args:
-        photo_id (int): The ID of the photo to update.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to update.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     photo = await repository_tags.remove_tags(photo_id, current_user, db)
@@ -83,17 +81,16 @@ async def add_tag(
     """
     Add a single tag to a photo.
 
-    Args:
-        photo_id (int): The ID of the photo to update.
-        tag (str): The tag to add.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to update.
+    - **tag** (str): The tag to add.
+    - **db** (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     photo = await repository_tags.add_tag(photo_id, tag, current_user, db)
@@ -114,17 +111,16 @@ async def remove_tag(
     """
     Remove a single tag from a photo.
 
-    Args:
-        photo_id (int): The ID of the photo to update.
-        tag (str): The tag to remove.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo to update.
+    - **tag** (str): The tag to remove.
+    - **db** (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
 
     Raises:
-        HTTPException: If the photo is not found.
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     photo = await repository_tags.remove_tag(photo_id, tag, current_user, db)
@@ -140,15 +136,14 @@ async def search_photos_by_tag(tag: str, db: Session = Depends(get_db)):
     """
     Search for photos by tag.
 
-    Args:
-        tag (str): The tag to search for.
-        db (Session): Database session dependency.
+    - **tag** (str): The tag to search for.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If no photos are found.
+    - **HTTPException**: If no photos are found.
 
     Returns:
-        List[PhotoResponse]: A list of photos with the specified tag.
+    - **List[PhotoResponse]**: A list of photos with the specified tag.
     """
 
     photos = await repository_tags.search_photos(tag, db)

@@ -39,6 +39,25 @@ async def change_size(photo_id: int,
                       db: Session = Depends(get_db)):
 
     # Check validity of dimensions
+    
+    """
+    Change the size of a photo.
+
+    - **photo_id** (int): The ID of the photo.
+    - **height** (int): The new height of the photo.
+    - **width** (int): The new width of the photo.
+    - **crop** (CropEnum): Crop options.
+    - **gravity** (GravityEnum): Gravity options.
+    - **background** (str): Background options.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the photo is not found or if the dimensions are invalid.
+
+    Returns:
+    - **PhotoEffectResponse**: The updated photo details.
+    """
     if width <= 0 or height <= 0:
         raise HTTPException(status_code=400, detail="Width and height must be positive numbers.")
 
@@ -61,10 +80,20 @@ async def change_size(photo_id: int,
 async def generate_qr(photo_id: int,
                       current_user: User = Depends(auth_service.get_current_user),
                       db: Session = Depends(get_db)):
-    """
-    Takes parameter url for generating a QR-code.
-    """
 
+    """
+    Generate a QR code for a photo.
+
+    - **photo_id** (int): The ID of the photo.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the photo is not found.
+
+    Returns:
+    - **StreamingResponse**: The QR code as a PNG image.
+    """
     photo = await repository_photos.read_photo(photo_id, current_user, db)
     url = photo.transformed_url
 

@@ -132,8 +132,7 @@ class UserAverageRating(BaseModel):
     rating: float
 
 class RatingCreate(BaseModel):
-    rating: int
-
+    rating: int = Field(ge=0, le=5)
 
 class Rating(RatingCreate):
     id: int

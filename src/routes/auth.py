@@ -38,15 +38,14 @@ async def signup(user: UserCreateModel, background_tasks: BackgroundTasks, reque
     """
     Create a new user account.
 
-    Args:
-        user (UserCreateModel): The user information for registration.
-        db (Session, optional): Dependency for the database session.
+    - **user** (UserCreateModel): The user information for registration.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the user already exists.
+    - **HTTPException**: 409 error if the user already exists.
 
     Returns:
-        UserResponseModel: The newly created user's data.
+    - **UserResponseModel**: The newly created user's data.
     """
     exist_user = await repository_users.get_user_by_email(user.email, db)
     if exist_user:
@@ -85,16 +84,16 @@ async def login_user(
     """
     Log in the user and generate access and refresh tokens.
 
-    Args:
-        user (OAuth2PasswordRequestForm): The login credentials.
-        db (Session, optional): Dependency for the database session.
+    - **user** (OAuth2PasswordRequestForm): The login credentials.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the email or password is invalid.
+    - **HTTPException**: If the email or password is invalid.
 
     Returns:
-        TokenModel: The access and refresh tokens for the user.
+    - **TokenModel**: The access and refresh tokens for the user.
     """
+
     user_login = await repository_users.get_user_by_email(user.username, db)
     if not user_login.confirmed:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Email not confirmed')
@@ -129,15 +128,14 @@ async def refresh_token(
     """
     Refresh the access token using a valid refresh token.
 
-    Args:
-        credentials (HTTPAuthorizationCredentials): The authorization credentials with the refresh token.
-        db (Session, optional): Dependency for the database session.
+    - **credentials** (HTTPAuthorizationCredentials): The authorization credentials with the refresh token.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the refresh token is invalid or mismatched.
+    - **HTTPException**: If the refresh token is invalid or mismatched.
 
     Returns:
-        TokenModel: The new access and refresh tokens.
+    - **TokenModel**: The new access and refresh tokens.
     """
 
     if hasattr(credentials, "credentials"):
@@ -167,15 +165,14 @@ async def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
     """
     Log out the user and add the token to the blacklist.
 
-    Args:
-        token (str): The access token.
-        db (Session, optional): Dependency for the database session.
+    - **token** (str): The access token.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the token is invalid.
+    - **HTTPException**: If the token is invalid.
 
     Returns:
-        dict: A confirmation message for successful logout.
+    - **dict**: A confirmation message for successful logout.
     """
 
     try:
@@ -205,17 +202,16 @@ async def update_user_role(
     """
     Update the role of a user (admin only).
 
-    Args:
-        user_id (int): The ID of the user whose role needs to be updated.
-        role_data (RoleUpdateModel): The new role for the user.
-        current_user (User, optional): The current authenticated admin user.
-        db (Session, optional): Dependency for the database session.
+    - **user_id** (int): The ID of the user whose role needs to be updated.
+    - **role_data** (RoleUpdateModel): The new role for the user.
+    - **current_user** (User, optional): The current authenticated admin user.
+    - **db** (Session, optional): Dependency for the database session.
 
     Raises:
-        HTTPException: If the user is not found or if the current user is not an admin.
+    - **HTTPException**: If the user is not found or if the current user is not an admin.
 
     Returns:
-        dict: A confirmation message for successful role update.
+    - **dict**: A confirmation message for successful role update.
     """
     is_admin(current_user)
 
@@ -234,14 +230,16 @@ async def update_user_role(
 @router.get('/confirmed_email/{token}')
 async def confirmed_email(token: str, db: Session = Depends(get_db)):
     """
-    Sending confirmation email to user after signup.
+    Confirm a user's email.
 
-    :param token: security token for email confirmation.
-    :type token: str
-    :param db: The database session.
-    :type db: Session
-    :return: Updated contact.
-    :rtype: Dict
+    - **token** (str): The security token for email confirmation.
+    - **db** (Session): The database session.
+
+    Raises:
+    - **HTTPException**: If the user is not found or if the user's email is already confirmed.
+
+    Returns:
+    - **dict**: A confirmation message for successful email confirmation.
     """
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)

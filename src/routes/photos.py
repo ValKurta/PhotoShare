@@ -34,15 +34,14 @@ async def create_photo(
 ):
     """
     Upload a new photo to Cloudinary and save it in the database.
-
     Args:
-        file (UploadFile): The photo file to be uploaded.
-        description (str): Description of the photo.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **file** (UploadFile): The photo file to be uploaded.
+    - **description** (str): Description of the photo.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
-        PhotoResponse: The created photo details.
+    - **PhotoResponse**: The created photo details.
     """
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
@@ -78,12 +77,12 @@ async def read_photo(
     Retrieve details of a photo by its ID.
 
     Args:
-        photo_id (int): ID of the photo.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): ID of the photo.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
-        PhotoResponse: The photo details.
+    - **PhotoResponse**: The photo details.
     """
 
     photo = await repository_photos.read_photo(photo_id, current_user, db)
@@ -105,15 +104,14 @@ async def update_photo(
     """
     Update the photo and its description.
 
-    Args:
-        photo_id (int): ID of the photo.
-        file (UploadFile): The new photo file to be uploaded.
-        description (str): New description for the photo.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): ID of the photo.
+    - **file** (UploadFile): The new photo file to be uploaded.
+    - **description** (str): New description for the photo.
+    - **db** (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     # Create a clean file identifier
@@ -156,14 +154,17 @@ async def delete_photo(
     """
     Delete a photo by its ID.
 
-    Args:
-        photo_id (int): ID of the photo.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        dict: A confirmation message that the photo was deleted.
+    - **dict**: A confirmation message that the photo was deleted.
     """
+
 
     photo = await repository_photos.delete_photo(photo_id, current_user, db)
     return {"photo": photo, "message": "was successfully deleted"}
@@ -179,14 +180,16 @@ async def change_description(
     """
     Update the description of a photo.
 
-    Args:
-        photo_id (int): ID of the photo.
-        description (str): New description for the photo.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The ID of the photo.
+    - **description** (str): New description for the photo.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the photo is not found.
 
     Returns:
-        PhotoResponse: The updated photo details.
+    - **PhotoResponse**: The updated photo details.
     """
 
     photo = await repository_photos.change_description(
@@ -208,13 +211,15 @@ async def get_users_photos(
     """
     Retrieve all photos posted by a specific user.
 
-    Args:
-        user_id (int): The ID of the user.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **user_id** (int): The ID of the user.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user is not found.
 
     Returns:
-        List[PhotoResponse]: List of the user's photos.
+    - **List[PhotoResponse]**: List of the user's photos.
     """
 
     photos = await repository_photos.get_users_photos(user_id, current_user, db)
@@ -233,13 +238,13 @@ async def get_my_photos(
     """
     Retrieve all photos posted by the current user.
 
-    Args:
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
-        List[PhotoResponse]: List of the user's photos.
+    - **List[PhotoResponse]**: List of the user's photos.
     """
+
 
     photos = await repository_photos.get_users_photos(current_user.id, current_user, db)
     if len(photos) == 0:
@@ -253,20 +258,21 @@ async def average_rating(photo_id: int, db: Session = Depends(get_db)):
     """
     Retrieve the average rating for a photo.
 
-    Args:
-        photo_id (int): The ID of the photo.
-        db (Session, optional): Dependency for database connection. Defaults to get_db.
+    - **photo_id** (int): The ID of the photo.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: 404 error if the photo is not found or has no ratings.
+    - **HTTPException**: 404 error if the photo is not found or has no ratings.
 
     Returns:
-        dict: A dictionary with the photo ID and its average rating.
+    - **dict**: A dictionary with the photo ID and its average rating.
         Example:
+        ```
         {
             "photo_id": 1,
             "average_rating": 4.3
         }
+        ```
     """
 
     avg_rating = await get_average_rating(db, photo_id)
@@ -277,3 +283,4 @@ async def average_rating(photo_id: int, db: Session = Depends(get_db)):
         )
 
     return {"photo_id": photo_id, "average_rating": avg_rating}
+

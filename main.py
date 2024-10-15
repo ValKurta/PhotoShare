@@ -53,10 +53,6 @@ async def lifespan(app: FastAPI):
     print("Application is shutting down")
 
 
-app = FastAPI(
-    lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))]
-)
-
 description = """
 ChimichangApp API helps you do awesome stuff. 🚀
 
