@@ -55,10 +55,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))]
-)
-
-app = FastAPI(
     title="PhotoShare RestAPI",
     description="""
     ## Welcome to PhotoShare API!
@@ -94,17 +90,17 @@ app.include_router(users.router)
 app.add_middleware(TokenBlacklistMiddleware)
 
 
-origins = [
-    "http://localhost:3000",  # FrontEnd
-]
+# origins = [
+#     "http://localhost:3000",  # FrontEnd
+# ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
 @app.get("/")
