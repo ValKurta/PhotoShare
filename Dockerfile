@@ -25,5 +25,6 @@ COPY . .
 EXPOSE 8000
 
 # # Ensure the script is executable
+#RUN chmod 775 /app/entrypoint.sh
 RUN chmod +x entrypoint.sh
-CMD ["./entrypoint.sh"]
+CMD ["bash", "/app/entrypoint.sh"]
