@@ -66,7 +66,7 @@ class TokenModel(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
-<<<<<<< HEAD
+
 class CommentBase(BaseModel):
     photo_id: int
     text: str

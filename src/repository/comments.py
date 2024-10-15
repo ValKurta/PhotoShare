@@ -1,4 +1,3 @@
-# src/repository/comments.py
 from sqlalchemy.orm import Session
 from src.database.models import Comment
 from datetime import datetime
@@ -23,13 +22,10 @@ def update_comment(db: Session, comment_id: int, text: str):
     db.refresh(comment)
     return comment
 
-
-
-def delete_comment(db: Session, comment_id: int):
+def delete_comment_by_id(db: Session, comment_id: int):
     comment = db.query(Comment).filter(Comment.id == comment_id).first()
     if not comment:
-        return None  
+        return None
     db.delete(comment)
     db.commit()
     return comment
-

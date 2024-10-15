@@ -8,7 +8,7 @@ from src.repository.comments import (
 from src.schemas import CommentCreate, CommentUpdate, Comment
 from src.services.auth import auth_service
 from src.database.models import User, Comment as DB_Comment
-from src.repository.comments import create_comment, get_comments, update_comment, delete_comment
+from src.repository.comments import create_comment, get_comments, update_comment, delete_comment_by_id
 from src.schemas import CommentCreate, CommentUpdate,  Comment
 from src.services.auth import auth_service
 from src.database.models import User, Comment as DB_Comment
@@ -49,7 +49,7 @@ async def add_comment(
 def read_comments(photo_id: int, db: Session = Depends(get_db)):
     """
     Get all comments for a specific photo.
-
+    Arguments:
     - **photo_id** (int): The ID of the photo.
     - **db** (Session): Database session dependency.
 
@@ -74,7 +74,7 @@ async def modify_comment(
 ):
     """
     Update an existing comment.
-
+    Arguments:
     - **comment_id** (int): The ID of the comment to update.
     - **comment** (CommentUpdate): The updated comment data.
     - **db** (Session): Database session dependency.
@@ -99,7 +99,7 @@ async def modify_comment(
         )
 
     # The comment refresh
-    for key, value in comment.dict(exclude_unset=True).items():
+    for key, value in comment.model_dump(exclude_unset=True).items():
         setattr(existing_comment, key, value)
 
     db.commit()
@@ -107,17 +107,33 @@ async def modify_comment(
 
     return existing_comment
 
+
 @router.delete("/delete_comment/{comment_id}")
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)):
+    """
+    Delete a comment by its ID.
+    Arguments:
+    - **comment_id** (int): The ID of the comment to update.
+    - **db** (Session): Database session dependency.
+    - **current_user** (User): The current authenticated user.
+
+    Raises:
+    - **HTTPException**: If the comment is not found (404).
+    - **HTTPException**: If the current user is not authorized to delete the comment (403).
+
+    Returns:
+    - **DB_Comment**: A success message indicating that the comment was deleted.
+    """
 
     comment = db.query(DB_Comment).filter(DB_Comment.id == comment_id).first()
 
-    if comment.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to delete this comment")
     if comment is None:
         raise HTTPException(status_code=404, detail="Comment not found")
+    if comment.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this comment")
 
-    delete_comment(db, comment_id)
+    # Call the synchronous delete function without await
+    delete_comment_by_id(db, comment_id)
 
     return {"message": "Comment deleted successfully"}
