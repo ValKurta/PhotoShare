@@ -43,6 +43,22 @@ async def update_user_in_db(user: User, db: Session):
     db.refresh(user)
 
 
+async def confirmed_email(email: str, db: Session) -> None:
+    """
+    Changes status of user to 'confirmed' after email confirmation.
+
+    :param email: email to be confirmed.
+    :type email: str
+    :param db: The database session.
+    :type db: Session
+    :return: None.
+    :rtype: None
+    """
+    user = await get_user_by_email(email, db)
+    user.confirmed = True
+    db.commit()
+
+
 async def update_avatar(email, url: str, db: Session) -> User:
     user = await get_user_by_email(email, db)
     user.avatar = url

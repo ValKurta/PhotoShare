@@ -1,3 +1,4 @@
+from fastapi import APIRouter, HTTPException, status, Depends, Security, BackgroundTasks, Request
 from fastapi import APIRouter, HTTPException, status, Depends, Security, Form
 from jose import JWTError, jwt
 
@@ -21,6 +22,7 @@ from src.database.models import User
 from pydantic import BaseModel
 from src.routes.permissions import is_admin
 from src.conf.config import settings
+from src.services.email import send_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -32,7 +34,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
     response_model=UserResponseModel,
     status_code=status.HTTP_201_CREATED,
 )
-async def signup(user: UserCreateModel, db: Session = Depends(get_db)):
+async def signup(user: UserCreateModel, background_tasks: BackgroundTasks, request: Request, db: Session = Depends(get_db)):
     """
     Create a new user account.
 
@@ -66,9 +68,12 @@ async def signup(user: UserCreateModel, db: Session = Depends(get_db)):
     user_data["role"] = role
 
     new_user = await repository_users.create_user(user_data, db)
+    background_tasks.add_task(send_email, new_user.email, new_user.username, request.base_url)
 
     response_data = UserResponseModel(
-        user=new_user, role=new_user.role, detail="User successfully created"
+        user=new_user,
+        role=new_user.role,
+        detail="User successfully created. Check your email for confirmation."
     )
     return response_data
 
@@ -91,6 +96,8 @@ async def login_user(
         TokenModel: The access and refresh tokens for the user.
     """
     user_login = await repository_users.get_user_by_email(user.username, db)
+    if not user_login.confirmed:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Email not confirmed')
     if user_login is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email"
@@ -222,3 +229,25 @@ async def update_user_role(
     await repository_users.update_user_in_db(user, db)
 
     return {"msg": f"User {user.username}'s role updated to {user.role}"}
+
+
+@router.get('/confirmed_email/{token}')
+async def confirmed_email(token: str, db: Session = Depends(get_db)):
+    """
+    Sending confirmation email to user after signup.
+
+    :param token: security token for email confirmation.
+    :type token: str
+    :param db: The database session.
+    :type db: Session
+    :return: Updated contact.
+    :rtype: Dict
+    """
+    email = await auth_service.get_email_from_token(token)
+    user = await repository_users.get_user_by_email(email, db)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification error")
+    if user.confirmed:
+        return {"message": "Your email is already confirmed"}
+    await repository_users.confirmed_email(email, db)
+    return {"message": "Email confirmed"}
