@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from enum import Enum
+from cloudinary import CloudinaryImage
 
 
 
@@ -38,8 +39,6 @@ class GravityEnum(str, Enum):
     option14 = "auto:ocr_text"
     option15 = "face"
     option16 = "faces"
-    option17 = "face"
-    option18 = "face"
 
 
 class PhotoEffectResponse(BaseModel):

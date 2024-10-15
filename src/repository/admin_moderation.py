@@ -11,6 +11,8 @@ from datetime import date, timedelta
 
 from fastapi import UploadFile
 
+from src.services.average_rating import get_average_rating_user_gives, get_user_rating
+
 
 async def create_photo(user_id:int, text: str, url: str, db: Session) -> Photo:
 
@@ -85,6 +87,15 @@ async def search_photos(tag: str, db: Session) -> list[Photo]:
     return list(photos)
 
 async def get_user_statistics(db: Session):
+    """
+    Retrieve statistics for all users in the system.
+
+    Args:
+    - **db** (Session): Database session dependency.
+
+    Returns:
+    - **List[UserStatistics]**: A list of user statistics.
+    """
     statistics = []
     users = db.query(User).all()
 
@@ -93,7 +104,9 @@ async def get_user_statistics(db: Session):
             user_id=user.id,
             username=user.username,
             num_images=db.query(Photo).filter(Photo.user_id == user.id).count(),
-            num_comments=db.query(Comment).filter(Comment.user_id == user.id).count()
+            num_comments=db.query(Comment).filter(Comment.user_id == user.id).count(),
+            rating = await get_user_rating(db, user.id),
+            average_rating_given=await get_average_rating_user_gives(db, user.id),
         )
         statistics.append(user_stats)
 

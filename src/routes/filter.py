@@ -27,18 +27,17 @@ async def filter_photos(
     """
     Filter photos based on rating and date.
 
-    Args:
-        min_rating (int): The min rating limitation.
-        max_rating (RoleUpdateModel): The min rating limitation.
-        start_date (User, optional): The min date of photo creation.
-        end_date (User, optional): The min date of photo creation..
-        db (Session, optional): Dependency for the database session.
+    - **min_rating** (int): The min rating limitation.
+    - **max_rating** (RoleUpdateModel): The min rating limitation.
+    - **start_date** (User, optional): The min date of photo creation.
+    - **end_date** (User, optional): The min date of photo creation.
+    - **db** (Session): Database session dependency.
 
     Raises:
-        HTTPException: If the photo is not found or Wrong date format used.
+    - **HTTPException**: If the photo is not found or Wrong date format used.
 
     Returns:
-        dict: A confirmation message for successful role update.
+    - **dict**: A confirmation message for successful role update.
     """
     try:
         date_adapter = TypeAdapter(Optional[date])

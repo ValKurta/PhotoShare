@@ -29,22 +29,83 @@ cloudinary.config(
     )
 
 
-async def change_size(photo_id: int, height: int, width: int, crop: CropEnum, gravity: GravityEnum, background: str,
-                      user: User, db: Session) -> Type[Photo]:  #
+async def gravity_crop(photo_id: int, aspect_ratio: str, width: int, crop: str, gravity: str,
+                       user: User, db: Session) -> Type[Photo]:
     photo = db.query(Photo).join(User).filter(and_(Photo.id == photo_id, User.id == user.id)).first()
     if photo is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo was not found')
     photo_public_id = await get_public_id(photo.url)
+
     version = await get_image_version(photo_public_id)
     try:
-        resized_photo_url = CloudinaryImage(photo_public_id).build_url(
-            background=background, gravity=gravity.value, height=height, width=width, crop=crop.value, version=version)
+        resized_photo_url = CloudinaryImage(photo_public_id).build_url(gravity=gravity,
+                                                                       aspect_ratio=aspect_ratio,
+                                                                       width=width, crop=crop,
+                                                                       version=version)
         if resized_photo_url:
             photo.transformed_url = resized_photo_url
             db.commit()
         return photo
     except ResponseValidationError as e:
         print(f'Error {e}')
+
+    return photo
+
+
+async def coordinates_crop(photo_id: int, aspect_ratio: str, width: int, x: int, y: int, crop: str,
+                           user: User, db: Session) -> Type[Photo]:
+    photo = db.query(Photo).join(User).filter(and_(Photo.id == photo_id, User.id == user.id)).first()
+    if photo is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Photo was not found')
+    photo_public_id = await get_public_id(photo.url)
+
+    version = await get_image_version(photo_public_id)
+    try:
+        resized_photo_url = CloudinaryImage(photo_public_id).build_url(aspect_ratio=aspect_ratio,
+                                                                       width=width, crop=crop, x=x, y=y,
+                                                                       version=version)
+        if resized_photo_url:
+            photo.transformed_url = resized_photo_url
+            db.commit()
+        return photo
+    except ResponseValidationError as e:
+        print(f'Error {e}')
+
+    return photo
+
+
+async def reset_transformation(photo_id: int, user: User, db: Session):
+    photo = db.query(Photo).join(User).filter(and_(Photo.id == photo_id, User.id == user.id)).first()
+    photo.transformed_url = photo.url
+    db.commit()
+    return photo
+
+
+async def save_transformation(photo_id: int, user: User, db: Session):
+    photo = db.query(Photo).join(User).filter(and_(Photo.id == photo_id, User.id == user.id)).first()
+    photo.url = photo.transformed_url
+    db.commit()
+    return photo
+
+
+async def roll_back_transformations(photo_id: int, user: User, db: Session):
+    photo = db.query(Photo).join(User).filter(and_(Photo.id == photo_id, User.id == user.id)).first()
+    photo_public_id = await get_public_id(photo.url)
+    version = await get_image_version(photo_public_id)
+    try:
+        url = cloudinary.CloudinaryImage(photo_public_id).build_url(
+            version=version
+        )
+        if url:
+            photo.transformed_url = url
+            photo.url = url
+            db.commit()
+        return photo
+    except ResponseValidationError as e:
+        print(f'Error {e}')
+
+    photo.url = photo.transformed_url
+    return photo
 
 
 async def get_public_id(url: str) -> str:
