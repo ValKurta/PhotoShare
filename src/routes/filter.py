@@ -24,6 +24,22 @@ async def filter_photos(
     end_date: Optional[str] = Query(None, description="End Date (YYYY-MM-DD)"),
     db: Session = Depends(get_db),
 ):
+    """
+    Filter photos based on rating and date.
+
+    Args:
+        min_rating (int): The min rating limitation.
+        max_rating (RoleUpdateModel): The min rating limitation.
+        start_date (User, optional): The min date of photo creation.
+        end_date (User, optional): The min date of photo creation..
+        db (Session, optional): Dependency for the database session.
+
+    Raises:
+        HTTPException: If the photo is not found or Wrong date format used.
+
+    Returns:
+        dict: A confirmation message for successful role update.
+    """
     try:
         date_adapter = TypeAdapter(Optional[date])
         start_date_parsed = (

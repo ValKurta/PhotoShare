@@ -16,6 +16,22 @@ async def rate_photo(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Rate a photo.
+
+    Args:
+        photo_id (int): The ID of the photo to rate.
+        rating (RatingCreate): The rating data.
+        db (Session): Database session dependency.
+        current_user (User): The current authenticated user.
+
+    Raises:
+        HTTPException: If the photo is not found or if the user is the owner of the photo.
+
+    Returns:
+        Rating: The created rating for the photo.
+    """
+
     photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if not photo:
         raise HTTPException(

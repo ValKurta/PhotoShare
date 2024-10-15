@@ -15,20 +15,34 @@ from src.database.models import User
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    cloud_name=settings.cloudinary_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
 
 # TODO: fetch all photos of all users
 
 
-@router.post('/post_photo', response_model=PhotoResponse)
-async def create_photo(file: UploadFile = File(),
-                       description: str = Form(),
-                       current_user: User = Depends(auth_service.get_current_user),
-                       db: Session = Depends(get_db)):
+@router.post("/post_photo", response_model=PhotoResponse)
+async def create_photo(
+    file: UploadFile = File(),
+    description: str = Form(),
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a new photo to Cloudinary and save it in the database.
+
+    Args:
+        file (UploadFile): The photo file to be uploaded.
+        description (str): Description of the photo.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        PhotoResponse: The created photo details.
+    """
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
     clean_filename = file.filename.replace(".", "")
@@ -59,6 +73,18 @@ async def read_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieve details of a photo by its ID.
+
+    Args:
+        photo_id (int): ID of the photo.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        PhotoResponse: The photo details.
+    """
+
     photo = await repository_photos.read_photo(photo_id, current_user, db)
     if photo is None:
         raise HTTPException(
@@ -75,6 +101,19 @@ async def update_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Update the photo and its description.
+
+    Args:
+        photo_id (int): ID of the photo.
+        file (UploadFile): The new photo file to be uploaded.
+        description (str): New description for the photo.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        PhotoResponse: The updated photo details.
+    """
 
     # Create a clean file identifier
     clean_description = description[:7].replace(" ", "")
@@ -113,6 +152,18 @@ async def delete_photo(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Delete a photo by its ID.
+
+    Args:
+        photo_id (int): ID of the photo.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        dict: A confirmation message that the photo was deleted.
+    """
+
     photo = await repository_photos.delete_photo(photo_id, current_user, db)
     return {"photo": photo, "message": "was successfully deleted"}
 
@@ -124,6 +175,18 @@ async def change_description(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Update the description of a photo.
+
+    Args:
+        photo_id (int): ID of the photo.
+        description (str): New description for the photo.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        PhotoResponse: The updated photo details.
+    """
 
     photo = await repository_photos.change_description(
         photo_id, description, current_user, db
@@ -141,6 +204,18 @@ async def get_users_photos(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieve all photos posted by a specific user.
+
+    Args:
+        user_id (int): The ID of the user.
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        List[PhotoResponse]: List of the user's photos.
+    """
+
     photos = await repository_photos.get_users_photos(user_id, current_user, db)
     if len(photos) == 0:
         raise HTTPException(
@@ -154,6 +229,17 @@ async def get_my_photos(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Retrieve all photos posted by the current user.
+
+    Args:
+        current_user (User): The current authenticated user.
+        db (Session): Database session dependency.
+
+    Returns:
+        List[PhotoResponse]: List of the user's photos.
+    """
+
     photos = await repository_photos.get_users_photos(current_user.id, current_user, db)
     if len(photos) == 0:
         raise HTTPException(
