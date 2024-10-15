@@ -21,6 +21,7 @@ from src.routes import (
     tags,
     comments,
     users,
+    photo_transformation
 )
 
 from src.middleware.security_middleware import TokenBlacklistMiddleware
@@ -81,6 +82,7 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(filter.router)
 app.include_router(photos.router)
+app.include_router(photo_transformation.router)
 app.include_router(tags.router)
 app.include_router(admin_moderation.router)
 app.include_router(rating.router)
