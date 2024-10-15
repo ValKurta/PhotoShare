@@ -8,10 +8,24 @@ from src.database.db import get_db
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 
-@router.get("/photos/search", response_model=List[PhotoResponse])
+@router.get("/search", response_model=List[PhotoResponse])
 async def search_photos_route(
     tag: str = None, keyword: str = None, db: Session = Depends(get_db)
 ):
+    """
+    Search for photos by tag or keyword.
+
+    - **tag** (str, optional): Tag to filter photos by.
+    - **keyword** (str, optional): Keyword to filter photos by.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: 400 error if neither 'tag' nor 'keyword' is provided.
+
+    Returns:
+    - **List[PhotoResponse]**: List of photos matching the search criteria.
+    """
+
     if not tag and not keyword:
         raise HTTPException(
             status_code=400,

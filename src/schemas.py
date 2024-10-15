@@ -26,8 +26,12 @@ class UserDbModel(BaseModel):
     username: str = Field(min_length=5, max_length=50)
     email: EmailStr
     created_at: datetime
+    updated_at: datetime
     role: RoleEnum = RoleEnum.user
     allowed: bool = True
+    avatar: Optional[str] = None
+    phone_number: Optional[str] = None
+    confirmed: bool
 
     class Config:
         from_attributes = True
@@ -42,12 +46,27 @@ class UserResponseModel(BaseModel):
         from_attributes = True
 
 
+class UserProfilePublic(BaseModel):
+    username: str = Field(min_length=5, max_length=50)
+    avatar: Optional[str] = None
+    role: RoleEnum
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserProfileEdit(BaseModel):
+    username: str
+    phone_number: Optional[str] = None
+
+
 class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
 
-
+<<<<<<< HEAD
 class CommentBase(BaseModel):
     photo_id: int
     text: str
@@ -64,7 +83,6 @@ class CommentUpdate(BaseModel):
 class Comment(BaseModel):
     id: int
     text: str
-    photo_id: int
     user_id: int
     created_at: datetime
     updated_at: datetime
@@ -106,11 +124,15 @@ class UserStatistics(BaseModel):
     username: str
     num_images: int
     num_comments: int
+    rating: float
+    average_rating_given: float
 
+class UserAverageRating(BaseModel):
+    user_id: int
+    rating: float
 
 class RatingCreate(BaseModel):
-    rating: int
-
+    rating: int = Field(ge=0, le=5)
 
 class Rating(RatingCreate):
     id: int
