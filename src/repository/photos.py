@@ -64,7 +64,7 @@ async def delete_photo(photo_id: int, user: User, db: Session) -> Type[Photo]:
 
 
 async def change_description(
-    photo_id: int, description: str, db: Session
+    photo_id: int, description: str, user: User, db: Session
 ) -> Photo | None:
 
     photo = db.query(Photo).filter(and_(Photo.id == photo_id, Photo.user_id == user.id)).first()
