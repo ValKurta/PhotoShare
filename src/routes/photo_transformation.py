@@ -38,13 +38,13 @@ async def change_size(photo_id: int,
     Change size of photo.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        aspect_ratio (str): Ratio between width and height(1.5, 3:4).
-        width (int): width of image.
-        crop (CropEnum): cropping mode.
-        gravity (GravityEnum): specify the focus.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **aspect_ratio** (str): Ratio between width and height(1.5, 3:4).
+    - **width** (int): width of image.
+    - **crop** (CropEnum): cropping mode.
+    - **gravity** (GravityEnum): specify the focus.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -76,20 +76,20 @@ async def coordinates_crop(photo_id: int,
                            current_user: User = Depends(auth_service.get_current_user),
                            db: Session = Depends(get_db)):
     """
-   Cropping photo by coordinates.
+    Cropping photo by coordinates.
 
-   Args:
-       photo_id (int): The photo file to be resized.
-       aspect_ratio (str): Ratio between width and height(1.5, 3:4).
-       width (int): width of image.
-       crop (CropEnum): cropping mode.
-       x_coordinate: x coordinate.
-       y_coordinate: y coordinate.
-       current_user (User): The current authenticated user.
-       db (Session): Database session dependency.
+    Args:
+    - **photo_id** (int): The photo file to be resized.
+    - **aspect_ratio** (str): Ratio between width and height(1.5, 3:4).
+    - **width** (int): width of image.
+    - **crop** (CropEnum): cropping mode.
+    - **x_coordinate** (int): x coordinate.
+    - **y_coordinate** (int): y coordinate.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
-   Returns:
-       Photo: The photo details.
+    Returns:
+        Photo: The photo details.
     """
 
     transformed_photo = await repository_effects.coordinates_crop(photo_id, aspect_ratio, width, x_coordinate,
@@ -108,11 +108,11 @@ async def resize_with_ratio(photo_id: int,
     Change size of photo.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        aspect_ratio (str): Ratio between width and height(1.5, 3:4).
-        width (int): width of image.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **spect_ratio** (str): Ratio between width and height(1.5, 3:4).
+    - **width** (int): width of image.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -132,10 +132,10 @@ async def cropping(photo_id: int,
     Cropping of the photo.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        crop (CropEnum): The Cropping mode.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **crop** (CropEnum): The Cropping mode.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -156,11 +156,11 @@ async def color_effects(photo_id: int,
    Implement color effects.
 
    Args:
-       photo_id (int): The photo file to be resized.
-       additional_parameter (str): additional parameter for effect (level: -100 +100).
-       effect (ColorEffectEnum): implemented effects.
-       current_user (User): The current authenticated user.
-       db (Session): Database session dependency.
+   - **photo_id** (int): The photo file to be resized.
+   - **additional_parameter** (str): additional parameter for effect (level: -100 +100).
+   - **effect** (ColorEffectEnum): implemented effects.
+   - **current_user** (User): The current authenticated user.
+   - **db** (Session): Database session dependency.
 
    Returns:
        Photo: The photo details.
@@ -181,11 +181,11 @@ async def special_effects(photo_id: int,
    Implement color effects.
 
    Args:
-       photo_id (int): The photo file to be resized.
-       additional_parameter (str): additional parameter for effect (level: 0-100).
-       effect (SpecialEffectsEnum): implemented effects.
-       current_user (User): The current authenticated user.
-       db (Session): Database session dependency.
+   - **photo_id** (int): The photo file to be resized.
+   - **additional_parameter** (str): additional parameter for effect (level: 0-100).
+   - **effect** (SpecialEffectsEnum): implemented effects.
+   - **current_user** (User): The current authenticated user.
+   - **db** (Session): Database session dependency.
 
    Returns:
        Photo: The photo details.
@@ -207,11 +207,11 @@ async def blur_effects(photo_id: int,
     Implement blur effects.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        additional_parameter (str): additional parameter for blur (level: 0-1000).
-        effect (BlurEffect): implemented effects.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **additional_parameter** (str): additional parameter for blur (level: 0-1000).
+    - **effect** (BlurEffect): implemented effects.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -236,14 +236,14 @@ async def camera(photo_id: int,
     Create a view on the image from the camera.
 
     Args:
-        photo_id (str): The photo file to be resized.
-        up (str): angle up-down of the camera -90 +90.
-        right (str): angle right-left of the camera -90 +90.
-        zoom (str): camera zoom for example 1.2.
-        exposure (str): exposure of the camera for example 1.8
-        image_format (str): format of the image.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (str): The photo file to be resized.
+    - **up** (str): angle up-down of the camera -90 +90.
+    - **right** (str): angle right-left of the camera -90 +90.
+    - **zoom** (str): camera zoom for example 1.2.
+    - **exposure** (str): exposure of the camera for example 1.8
+    - **image_format** (str): format of the image.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -268,9 +268,9 @@ async def reset_transformation(photo_id: int,
     Reset photo transformations.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -290,9 +290,9 @@ async def save_transformation(photo_id: int,
     Saves photo transformations.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -311,9 +311,9 @@ async def roll_back_transformations(photo_id: int,
     Rolls back photo to original view.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
@@ -333,9 +333,9 @@ async def generate_qr(photo_id: int,
     Generates qr-code for transformed photo.
 
     Args:
-        photo_id (int): The photo file to be resized.
-        current_user (User): The current authenticated user.
-        db (Session): Database session dependency.
+    - **photo_id** (int): The photo file to be resized.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
 
     Returns:
         Photo: The photo details.
