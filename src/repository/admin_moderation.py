@@ -111,3 +111,38 @@ async def get_user_statistics(db: Session):
         statistics.append(user_stats)
 
     return statistics
+
+
+async def block_user(user_id: int, db: Session) -> User | None:
+    """
+    Blocks a user in the system.
+
+    Args:
+    - **user_id** (int): The ID of the user to block.
+    - **db** (Session): Database session dependency.
+
+    Returns:
+    - **User | None**: The blocked user or None if the user is not found.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.allowed = False
+        db.commit()
+    return user
+
+async def unblock_user(user_id: int, db: Session) -> User | None:
+    """
+    Unblocks a user in the system.
+
+    Args:
+    - **user_id** (int): The ID of the user to unblock.
+    - **db** (Session): Database session dependency.
+
+    Returns:
+    - **User | None**: The unblocked user or None if the user is not found.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.allowed = True
+        db.commit()
+    return user

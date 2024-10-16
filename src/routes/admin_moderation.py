@@ -335,3 +335,65 @@ async def remove_comment(
         user_id=deleted_comment.user_id,
         photo_id=deleted_comment.photo_id,
     )
+
+
+@router.post("/block-user/{user_id}", status_code=status.HTTP_200_OK)
+async def block_user(
+    user_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Block a user by their ID.
+
+    - **user_id** (int): The ID of the user to block.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user is not found.
+
+    Returns:
+    - **dict**: A confirmation message that the user was blocked.
+    """
+
+    # Check if the current user is an admin
+    is_admin(current_user)
+
+    user = await repository_admin_moderation.block_user(user_id, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return {"message": f"User {user_id} was successfully blocked"}
+
+
+@router.post("/unblock-user/{user_id}", status_code=status.HTTP_200_OK)
+async def unblock_user(
+    user_id: int,
+    current_user: User = Depends(auth_service.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Unblock a user by their ID.
+
+    - **user_id** (int): The ID of the user to unblock.
+    - **current_user** (User): The current authenticated user (must be an admin).
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user is not found.
+
+    Returns:
+    - **dict**: A confirmation message that the user was unblocked.
+    """
+
+    # Check if the current user is an admin
+    is_admin(current_user)
+
+    user = await repository_admin_moderation.unblock_user(user_id, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return {"message": f"User {user_id} was successfully unblocked"}
