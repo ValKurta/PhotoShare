@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 from src.database.models import User
 from src.database.db import get_db
 from src.services.auth import auth_service
-from src.schemas import UserDbModel, UserProfilePublic, UserProfileEdit
+from src.schemas import UserAverageRating, UserDbModel, UserProfilePublic, UserProfileEdit
 from src.conf.config import settings
 from src.repository import users as repository_users
+from src.services.average_rating import get_user_rating
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -18,12 +19,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
     """
     Retrieve the current authenticated user's details.
-
-    Args:
-        current_user (User): The current authenticated user.
+    
+    Arguments:
+    - **current_user** (User): The current authenticated user.
 
     Returns:
-        UserDbModel: The current user's details.
+    - **UserDbModel**: The current user's details.
     """
     return current_user
 
@@ -32,6 +33,20 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
 async def update_my_profile(update_data: UserProfileEdit,
                             current_user: User = Depends(auth_service.get_current_user),
                             db: Session = Depends(get_db)):
+    """
+    Update the current authenticated user's profile.
+
+    Arguments:
+    - **update_data** (UserProfileEdit): The updated user profile data.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user does not exist or if the username is not at least 5 characters long or if the phone number is not at least 10 characters long and consists only of digits.
+
+    Returns:
+    - **UserDbModel**: The updated user profile.
+    """
     if update_data.username and len(update_data.username) < 5:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -51,6 +66,20 @@ async def update_my_profile(update_data: UserProfileEdit,
 @router.patch('/avatar', response_model=UserDbModel)
 async def update_avatar_user(file: UploadFile = File(), current_user: User = Depends(auth_service.get_current_user),
                              db: Session = Depends(get_db)):
+    """
+    Update the current authenticated user's avatar.
+
+    Arguments:
+    - **file** (UploadFile): The avatar image to upload.
+    - **current_user** (User): The current authenticated user.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user does not exist.
+
+    Returns:
+    - **UserDbModel**: The updated user profile.
+    """
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
@@ -67,6 +96,20 @@ async def update_avatar_user(file: UploadFile = File(), current_user: User = Dep
 
 @router.get("/profile/{user_id}", response_model=UserProfilePublic)
 async def get_user_profile(user_id: int, db: Session = Depends(get_db)):
+
+    """
+    Get the public profile of a user.
+
+    Arguments:
+    - **user_id** (int): The ID of the user to get the profile for.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user is not found.
+
+    Returns:
+    - **UserProfilePublic**: The public profile of the user.
+    """
     user = await repository_users.get_user_by_id(user_id, db)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -77,3 +120,25 @@ async def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "role": user.role,
         "created_at": user.created_at
     }
+
+
+@router.get("/{user_id}/rating", response_model=UserAverageRating)
+async def get_user_avg_rating(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get the average rating of a user.
+    
+    Arguments:
+    - **user_id** (int): The ID of the user to get the rating for.
+    - **db** (Session): Database session dependency.
+
+    Raises:
+    - **HTTPException**: If the user is not found.
+
+    Returns:
+    - **UserAverageRating**: The average rating of the user.
+    """
+    
+    res = await get_user_rating(db, user_id)
+    if res is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"user_id": user_id, "rating": res}

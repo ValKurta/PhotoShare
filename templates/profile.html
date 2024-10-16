@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile and Photos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .profile-container {
+            margin-bottom: 20px;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+        }
+        .profile-avatar {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .photos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .photo-item {
+            width: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .photo-item img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>User Profile</h2>
+        <div class="profile-info">
+            <img id="profile-avatar" class="profile-avatar" src="" alt="User Avatar">
+            <div>
+                <p><strong>Username:</strong> <span id="profile-username"></span></p>
+                <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                <p><strong>Joined:</strong> <span id="profile-joined"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="photos-container">
+        <h2>My Photos</h2>
+        <div id="photos-list">
+            <!-- Photos will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        // Fetch user profile and photos from API
+        async function fetchUserProfile() {
+            const response = await fetch('/api/users/me');  // Adjust the URL as per your backend route
+            const userData = await response.json();
+
+            // Set the profile info
+            document.getElementById('profile-username').textContent = userData.username;
+            document.getElementById('profile-email').textContent = userData.email;
+            document.getElementById('profile-joined').textContent = new Date(userData.created_at).toLocaleDateString();
+            document.getElementById('profile-avatar').src = userData.avatar || 'default-avatar.png';
+        }
+
+        async function fetchUserPhotos() {
+            const response = await fetch('/api/photos/get_my_photos');  // Adjust the URL as per your backend route
+            const photos = await response.json();
+
+            const photosList = document.getElementById('photos-list');
+            photosList.innerHTML = '';
+
+            photos.forEach(photo => {
+                const photoItem = document.createElement('div');
+                photoItem.classList.add('photo-item');
+
+                photoItem.innerHTML = `
+                    <img src="${photo.url}" alt="${photo.description}">
+                    <p>${photo.description}</p>
+                `;
+                photosList.appendChild(photoItem);
+            });
+        }
+
+        // Call the functions to fetch and display data
+        fetchUserProfile();
+        fetchUserPhotos();
+    </script>
+</body>
+</html>

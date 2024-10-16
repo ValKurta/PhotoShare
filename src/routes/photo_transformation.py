@@ -51,8 +51,8 @@ async def change_size(photo_id: int,
     """
 
     # Check validity of dimensions
-    if width <= 0:
-        raise HTTPException(status_code=400, detail="Height must be positive numbers.")
+    if width <= 0 or height <= 0:
+        raise HTTPException(status_code=400, detail="Width and height must be positive numbers.")
 
     # Check gravity and crop combinations
     if gravity != 'auto' and crop not in ['fill', 'crop']:
@@ -329,6 +329,7 @@ async def roll_back_transformations(photo_id: int,
 async def generate_qr(photo_id: int,
                       current_user: User = Depends(auth_service.get_current_user),
                       db: Session = Depends(get_db)):
+
     """
     Generates qr-code for transformed photo.
 
@@ -341,6 +342,13 @@ async def generate_qr(photo_id: int,
         Photo: The photo details.
     """
 
+
+    Raises:
+    - **HTTPException**: If the photo is not found.
+
+    Returns:
+    - **StreamingResponse**: The QR code as a PNG image.
+    """
     photo = await repository_photos.read_photo(photo_id, current_user, db)
     url = photo.transformed_url
 

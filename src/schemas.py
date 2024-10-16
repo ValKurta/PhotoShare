@@ -84,8 +84,8 @@ class Comment(BaseModel):
     id: int
     text: str
     user_id: int
-    photo_id: int
-    created_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -124,11 +124,15 @@ class UserStatistics(BaseModel):
     username: str
     num_images: int
     num_comments: int
+    rating: float
+    average_rating_given: float
 
+class UserAverageRating(BaseModel):
+    user_id: int
+    rating: float
 
 class RatingCreate(BaseModel):
-    rating: int
-
+    rating: int = Field(ge=0, le=5)
 
 class Rating(RatingCreate):
     id: int

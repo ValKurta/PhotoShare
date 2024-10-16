@@ -8,7 +8,8 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from contextlib import asynccontextmanager
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from src.routes import (
     auth,
@@ -17,7 +18,6 @@ from src.routes import (
     rating,
     search,
     filter,
-    average_rating,
     tags,
     comments,
     users,
@@ -54,27 +54,24 @@ async def lifespan(app: FastAPI):
     print("Application is shutting down")
 
 
-app = FastAPI(
-    lifespan=lifespan, dependencies=[Depends(RateLimiter(times=2, seconds=5))]
-)
+description = """
+## Welcome to PhotoShare API!
+
+This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
+
+### Features:
+- **User accounts**: Sign up, log in, and manage user roles;
+- **Photo management**: Upload and manage photos (Cloudinary); 
+- **Rating system**: Rate and get average ratings of photos.
+- **Comment system**: Create and manage comments for every photo.  
+    """
 
 app = FastAPI(
     title="PhotoShare RestAPI",
-    description="""
-    ## Welcome to PhotoShare API!
-
-    This API allows you to upload, manage, and rate photos. You can also manage users, photos, and tags.
-
-    ### Features:
-    - **User accounts**: Sign up, log in, and manage user roles;
-    - **Photo management**: Upload and manage photos (Cloudinary); 
-    - **Rating system**: Rate and get average ratings of photos.
-    - **Comment system**: Create and manage comments for every photo.  
-
-    """,
+    description=description,
     version="1.0.0",
-    lifespan=lifespan,
-    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
+#    lifespan=lifespan,
+#    dependencies=[Depends(RateLimiter(times=2, seconds=5))],
     docs_url="/docs",
     redoc_url=None,
 )
@@ -87,25 +84,27 @@ app.include_router(tags.router)
 app.include_router(admin_moderation.router)
 app.include_router(rating.router)
 app.include_router(search.router)
-app.include_router(average_rating.router)
+# app.include_router(average_rating.router)
 app.include_router(comments.router)
 app.include_router(users.router)
 
 app.add_middleware(TokenBlacklistMiddleware)
 
 
-origins = [
-    "http://localhost:3000",  # FrontEnd
-]
+# origins = [
+#     "http://localhost:3000",  # FrontEnd
+# ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 def read_root():
@@ -122,20 +121,23 @@ async def exception_handling_middleware_app(request: Request, call_next):
     return await exception_handling_middleware(request, call_next)
 
 
-if __name__ == "__main__":
-    reload_flag = True
-    if settings.use_https:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        keyfile_path = os.path.join(base_dir, "key.pem")
-        certfile_path = os.path.join(base_dir, "cert.pem")
+# if __name__ == "__main__":
+#     reload_flag = True
+#     if settings.use_https:
+#         base_dir = os.path.dirname(os.path.abspath(__file__))
+#         keyfile_path = os.path.join(base_dir, "key.pem")
+#         certfile_path = os.path.join(base_dir, "cert.pem")
 
-        uvicorn.run(
-            "main:app",
-            host="0.0.0.0",
-            port=8000,
-            ssl_keyfile=keyfile_path,
-            ssl_certfile=certfile_path,
-            reload=reload_flag,
-        )
-    else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)
+#         uvicorn.run(
+#             "main:app",
+#             host="0.0.0.0",
+#             port=8000,
+#             ssl_keyfile=keyfile_path,
+#             ssl_certfile=certfile_path,
+#             reload=reload_flag,
+#         )
+#     else:
+#         uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_flag)

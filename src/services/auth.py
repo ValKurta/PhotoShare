@@ -75,10 +75,10 @@ class Auth:
         """
         Creates token for email confirmation.
 
-        :param data: The dict for email token.
-        :type data: dict
-        :return: email token.
-        :rtype: str
+        - **data** (dict): The dict for email token.
+
+        Returns:
+        - **str**: email token.
         """
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=7)
