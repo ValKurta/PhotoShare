@@ -4,7 +4,6 @@ from enum import Enum
 from cloudinary import CloudinaryImage
 
 
-
 class CropEnum(str, Enum):
     option1 = "fill"
     option2 = "lfill"
@@ -39,6 +38,42 @@ class GravityEnum(str, Enum):
     option14 = "auto:ocr_text"
     option15 = "face"
     option16 = "faces"
+
+
+class SpecialEffectsEnum(str, Enum):
+    # option1 = "adv_redeye"
+    option2 = "anti_removal"
+    option3 = "art:incognito"
+    option15 = "cartoonify"
+
+
+class ColorEffectEnum(str, Enum):
+    # option1 = "auto_brightness"
+    # option2 = "auto_color"
+    # option3 = "auto_contrast"
+    option4 = "assist_colorblind"
+    option5 = "brightness"
+    option6 = "brightness_hsb"
+    option7 = "colorize"
+    option8 = "contrast"
+    option9 = "blue"
+    option0 = "sepia"
+    option1 = "sharpen"
+    option2 = 'unsharp_mask'
+
+
+class BackgroundEffect(str, Enum):
+    option8 = "background_removal"
+    option9 = "bgremoval"
+
+
+class BlurEffect(str, Enum):
+    option11 = "blur"
+    option12 = "blur_faces"
+
+
+class CameraEffect(str, Enum):
+    option17 = "camera"
 
 
 class PhotoEffectResponse(BaseModel):
